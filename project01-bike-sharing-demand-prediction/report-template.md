@@ -7,14 +7,51 @@
 The target prediction value of this task is count of bike sharing demand, i.e., the value must be nonnegative (> 0). The Kaggle competition also use Root Mean Squared Logarithmic Error (RMSLE) as the evaluation metric to determine the scores of each submission in the leaderboard. Logarithm of negative values are undefined; that's why we have to convert negative values before we submit the predictions to Kaggle. In this case, we convert negative values to zero.
 
 ### What was the top ranked model that performed?
-TODO: Add your explanation
+
+Using the original feature set and the instructions for AutoGluon training set up (600 seconds time limit to find the best quality model), we got a Weighted Ensemble model as the top performing one (evaluated based on root mean squared error: -114.938). Note that the results may vary depends on the machine that we're using, i.e., when I accidentally used `g4dn.xlarge` on Sagemaker Studio, I got a Weighted Ensemble model with evaluation RMSE = -114.66. *It suggests that if the feature sets are minimum, using a large machine to do a exhaustive search of the best performing model won't help much.*
+
+I haven't found if we can figure out what the underlying models under the Weighted Ensemble model, but it has the following hyperparameters:
+```json
+{
+    'use_orig_features': False,
+    'max_base_models': 25,
+    'max_base_models_per_type': 5,
+    'save_bag_folds': True
+}
+```
+
+On the Kaggle leaderboard, it results in 1.3922 RMSLE.
+
 
 ## Exploratory data analysis and feature creation
 ### What did the exploratory analysis find and how did you add additional features?
-TODO: Add your explanation
+To get a high level understanding of the data, we aggregate the hourly data into daily, then observe the demand pattern. Interestingly, it frequently has notably low demand for two or three days in a row, before getting back to normal. This finding suggests that "day of week" could be an important feature. We also extract other time information, namely: `day`, `day_of_week`, `week`, `month`.
+
+![plot-daily-demand.png](img/report/train-actual-demand-daily.png)
+
+Based on the Pearson correlation, we observe moderately positive correlation between bike sharing demand and hour of day, which makes sense - people might rent bike when they have to commute for work. We categorise the hour of day into several categories: morning commute (7 to 9 AM), lunch time (11 AM to 1 PM), evening commute (5 to 6 PM), and the rest as "others".
+
+![heatmap-correlation-matrix.png](img/report/heatmap-correlation-matrix.png)
+
+Note: `casual` and `registered` have strong correlation with the demand, which make sense since these columns represents the number of non-registered and registered users that rent the bike. We don't use them for model training.
+
+Aside from adding features, we also change the data type of categorical and boolean variables: `season`, `weather`, `holiday`, `workingday`, and `day_of_week`.
 
 ### How much better did your model perform after adding additional features and why do you think that is?
-TODO: Add your explanation
+
+We train another model with these features:
+
+```python
+[[
+    'datetime', 'season', 'holiday', 'workingday', 
+    'weather', 'temp','atemp', 
+    'humidity', 'windspeed', 
+    'hour', 'day', 'day_of_week',
+    'week', 'month', 'hour_activity'
+]]
+```
+
+It results in a pretty good improvement: 0.45711 RMSLE, still comes from a Weighted Ensemble model (evaluation RMSE: -31.88). Having the appropriate data types for categorical features inform the model to handle them better when it learns the pattern in the training data. Additionally, ensemble models are trained based on multiple simpler models. The simpler models could be trained using subset of the training data and the feature sets, e.g., in Random Forest or LightGBM. Hence, if there are more relevant features, the simpler models could learn better and construct a more accurate ensemble.
 
 ## Hyper parameter tuning
 ### How much better did your model perform after trying different hyper parameters?
