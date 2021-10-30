@@ -1,0 +1,10 @@
+pandas
+numpy
+seaborn
+jupyterlab
+autogluon
+mxnet<2.0.0
+bokeh==2.0.1
+wheel
+pip-tools
+ipywidgets
