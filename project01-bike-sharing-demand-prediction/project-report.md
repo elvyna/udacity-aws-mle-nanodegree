@@ -81,9 +81,58 @@ Spending too much time on hyperparameter tuning, e.g., set a larger hyperparamet
 ### Create a table with the models you ran, the hyperparameters modified, and the kaggle score.
 |model|hpo1|hpo2|hpo3|score|
 |--|--|--|--|--|
-|initial|?|?|?|?|
-|add_features|?|?|?|?|
-|hpo|?|?|?|?|
+|initial|N/A|N/A|N/A|1.39222|
+|add_features|N/A|N/A|N/A|0.45711|
+|hpo initial (basic)|time_limit = 120|num_trials = 5|search_strategy = 'auto'|1.38739|
+|hpo add_features (basic)|time_limit = 120|num_trials = 5|search_strategy = 'auto'|0.47117|
+|hpo add_features (advanced) - NN and LightGBM|time_limit = 120|num_trials = 5|search_strategy = 'auto'|0.49612|
+|hpo add_features (advanced) - more models|time_limit = 120|num_trials = 5|search_strategy = 'auto'|0.46025|
+|hpo add_features w/o 'week' (advanced) - more models|time_limit = 120|num_trials = 5|search_strategy = 'auto'|0.46126|
+
+Find the hyperparameter search space details for `hpo add_features` below (or in `Step 6 > Model-specific HPO ` sections of the notebook).
+
+```python
+nn_options = { 
+    'num_epochs': 10,
+    'learning_rate': ag.space.Real(1e-4, 1e-2, default=5e-4, log=True),
+    'activation': ag.space.Categorical('relu', 'softrelu', 'tanh'), 
+    'layers': ag.space.Categorical([100], [1000], [200, 100], [300, 200, 100]),  
+    'dropout_prob': ag.space.Real(0.0, 0.5, default=0.1),  
+}
+
+gbm_options = {
+    'num_boost_round': 100,
+    'num_leaves': ag.space.Int(lower=20, upper=66, default=36),
+    'max_depth': ag.space.Int(lower=3, upper=15, default=5),
+    'feature_fraction': ag.space.Real(0.1, 0.8, default=0.6),
+    'bagging_freq': ag.space.Int(lower=1, upper=5, default=2),
+    'bagging_fraction': ag.space.Real(0.4, 0.8, default=0.6),
+    'learning_rate': ag.space.Real(0.05, 0.3, default=0.07),
+    
+}
+
+cat_options = {
+    'depth': ag.space.Int(lower=4, upper=10, default=6),
+    'learning_rate': ag.space.Real(0.05, 0.3, default=0.07),
+    'iterations': ag.space.Int(lower=5, upper=50, default=5),
+    'l2_leaf_reg': ag.space.Real(0.05, 1.5, default=0.2),
+    'random_strength': ag.space.Real(0.2, 0.9, default=0.2),
+    'bagging_temperature': ag.space.Real(0.4, 0.8, default=0.6),
+}
+
+xgb_options = {
+    'max_leaves': ag.space.Int(lower=20, upper=66, default=36), 
+    'max_depth': ag.space.Int(lower=3, upper=15, default=6),
+    'colsample_bytree': ag.space.Real(0.1, 0.8, default=0.6),
+    'subsample': ag.space.Real(0.4, 0.8, default=0.6),
+    'learning_rate': ag.space.Real(0.05, 0.3, default=0.07),
+}
+
+fastai_options = {
+    'lr': ag.space.Real(0.05, 0.3, default=0.07),
+}
+
+```
 
 ### Create a line plot showing the top model score for the three (or more) training runs during the project.
 
