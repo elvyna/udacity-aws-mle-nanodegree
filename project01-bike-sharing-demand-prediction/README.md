@@ -2,6 +2,15 @@
 
 ## AWS Machine Learning Engineer Nanodegree
 
+## Submission
+
+Find the results here:
+- [notebook as ipynb](project-notebook.ipynb)
+- [notebook as HTML](project-notebook.html)
+- [project report](project-report.md)
+
+Note: to avoid having too many modelling outputs in the notebook, in some sections I read the model results from the local directory. Those models aren't uploaded due to the large size; however, you can set `RUN_TRAINING = True` to run the notebook. The results might not be exactly the same each time you run it, but they should have similar performance.
+
 ## Overview
 In this project, students will apply the knowledge and methods they learned in the Introduction to Machine Learning course to compete in a Kaggle competition using the AutoGluon library.
 

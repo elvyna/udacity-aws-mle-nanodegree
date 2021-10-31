@@ -4,7 +4,7 @@
 ## Initial Training
 ### What did you realize when you tried to submit your predictions? What changes were needed to the output of the predictor to submit your results?
 
-The target prediction value of this task is count of bike sharing demand, i.e., the value must be nonnegative (> 0). The Kaggle competition uses Root Mean Squared Logarithmic Error (RMSLE) as the evaluation metric to determine the scores of each submission in the leaderboard. Logarithm of negative values are undefined; that's why we have to convert negative values before we submit the predictions to Kaggle. In this case, we convert negative values to zero.
+The target prediction value of this task is count of bike sharing demand, i.e., the value must be nonnegative $\ge$ 0). The Kaggle competition uses Root Mean Squared Logarithmic Error (RMSLE) as the evaluation metric to determine the scores of each submission in the leaderboard. Logarithm of negative values are undefined; that's why we have to convert negative values before we submit the predictions to Kaggle. In this case, we convert negative values to zero.
 
 ### What was the top ranked model that performed?
 
@@ -27,11 +27,11 @@ On the Kaggle leaderboard, it results in 1.3922 RMSLE.
 
 ## Exploratory data analysis and feature creation
 ### What did the exploratory analysis find and how did you add additional features?
-To get a high level understanding of the data, we aggregate the hourly data into daily, then observe the demand pattern. Interestingly, it frequently has notably low demand for two or three days in a row, before getting back to normal. This finding suggests that "day of week" could be an important feature. We also extract other time information, namely: `day`, `day_of_week`, `week`, `month`.
+To get a high level understanding of the data, we aggregate the hourly data into daily, then observe the demand pattern. Interestingly, it frequently has notably low demand for two or three days in a row, before getting back to normal. This finding suggests that "day of week" could be an important feature. Hence, we extract several time information, namely: `hour`, `day`, `day_of_week`, `week`, `month`.
 
 ![plot-daily-demand.png](img/report/train-actual-demand-daily.png)
 
-Based on the Pearson correlation, we observe moderately positive correlation between bike sharing demand and hour of day, which makes sense - more people needs to rent bike when they have to commute for work. 
+Based on the Pearson correlation, we observe moderately positive correlation between bike sharing demand and hour of day, which makes sense - more people needs to rent bike between the morning and evening. 
 
 ![heatmap-correlation-matrix.png](img/report/heatmap-correlation-matrix.png)
 
@@ -71,7 +71,7 @@ The following figure shows the feature importances on this iteration. Hour and d
 ## Hyper parameter tuning
 ### How much better did your model perform after trying different hyper parameters?
 
-I tried using several inputs for hyperparameter tuning, starting from the high level AutoGluon settings (search strategy, number of trials, and time limit per model tuning) to the model-specific hyperparameter search spaces. Overall, I didn't find much improvements; the top performing model is found by using the default model fit settings - with focus on engineering more features.
+I tried using several inputs for hyperparameter tuning, starting from the high level AutoGluon settings (search strategy, number of trials, and time limit per model tuning) to the model-specific hyperparameter search spaces. Overall, I didn't find much improvements; the top performing model is found by using the default model fit settings - with focus on engineering more features. I could get a better model if I set a longer limit for the training time, since it allows AutoGluon to try more hyperparameters.
 
 ### If you were given more time with this dataset, where do you think you would spend more time?
 
@@ -144,4 +144,9 @@ fastai_options = {
 ![model_test_score.png](img/model_test_score.png)
 
 ## Summary
-TODO: Add your explanation
+
+When we fit AutoGluon using the initial features, the top model has the largest training error (`initial`; RMSE: -114.9). The top model that we got using basic hyperparameter optimisation (`hpo_initial`) with the same feature sets still result in similar errors. As seen in the previous line plots, the training error and test RMSLE from the Kaggle scores are aligned.
+
+Adding more relevant features as the inputs help the model learn; even when we use the default model configurations from AutoGluon (`add_features`). This iteration gives the least training RMSE and test RMSLSE. 
+
+I tried running several iterations to tune the hyperparameters, starting from only defining the higher level AutoGluon configuration (which specifies the search strategy, time limit, and trials for tuning). I didn't set too large values, and keep the `auto` search strategy (Bayesian optimisation) rather than grid search in order to save time. I also tried playing around with the model-specific hyperparameter search space. However, none of the tuning results perform better than the `add_features` model. We might be able to get an improvements if we set a longer time limit and set the search strategy to grid search. However, since we are using Auto ML, I'd prefer generating more features, e.g., categorising some continuous variables, and pass them to the models. 
