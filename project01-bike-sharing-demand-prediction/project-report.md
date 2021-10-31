@@ -4,7 +4,7 @@
 ## Initial Training
 ### What did you realize when you tried to submit your predictions? What changes were needed to the output of the predictor to submit your results?
 
-The target prediction value of this task is count of bike sharing demand, i.e., the value must be nonnegative (> 0). The Kaggle competition also use Root Mean Squared Logarithmic Error (RMSLE) as the evaluation metric to determine the scores of each submission in the leaderboard. Logarithm of negative values are undefined; that's why we have to convert negative values before we submit the predictions to Kaggle. In this case, we convert negative values to zero.
+The target prediction value of this task is count of bike sharing demand, i.e., the value must be nonnegative (> 0). The Kaggle competition uses Root Mean Squared Logarithmic Error (RMSLE) as the evaluation metric to determine the scores of each submission in the leaderboard. Logarithm of negative values are undefined; that's why we have to convert negative values before we submit the predictions to Kaggle. In this case, we convert negative values to zero.
 
 ### What was the top ranked model that performed?
 
@@ -31,13 +31,13 @@ To get a high level understanding of the data, we aggregate the hourly data into
 
 ![plot-daily-demand.png](img/report/train-actual-demand-daily.png)
 
-Based on the Pearson correlation, we observe moderately positive correlation between bike sharing demand and hour of day, which makes sense - people might rent bike when they have to commute for work. 
+Based on the Pearson correlation, we observe moderately positive correlation between bike sharing demand and hour of day, which makes sense - more people needs to rent bike when they have to commute for work. 
 
 ![heatmap-correlation-matrix.png](img/report/heatmap-correlation-matrix.png)
 
-Note: `casual` and `registered` have strong correlation with the demand, which make sense since these columns represents the number of non-registered and registered users that rent the bike. We don't use them for model training.
+Note: `casual` and `registered` have strong correlation with the demand -- these columns represents the number of non-registered and registered users that rent the bike. We don't use them for model training.
 
-Temperature (`temp` and `atemp`) also has a positive correlation with the bike sharing demand. In contrast, humidity is negatively correlated with the demand. Generally, day with a higher windspeed has a lower demand - however, there are some extreme values.
+Both temperature (`temp` and `atemp`) have a positive correlation with the bike sharing demand. In contrast, humidity is negatively correlated with the demand. Generally, day with a higher windspeed has a lower demand - however, there are some extreme values. In this work, we leave the extreme values as they are.
 
 ![scatterplot-lm.png](img/report/scatterplot-lm.png)
 
@@ -70,7 +70,8 @@ The following figure shows the feature importances on this iteration. Hour and d
 
 ## Hyper parameter tuning
 ### How much better did your model perform after trying different hyper parameters?
-TODO: Add your explanation
+
+I tried using several inputs for hyperparameter tuning, starting from the high level AutoGluon settings (search strategy, number of trials, and time limit per model tuning) to the model-specific hyperparameter search spaces. Overall, I didn't find much improvements; the top performing model is found by using the default model fit settings - with focus on engineering more features.
 
 ### If you were given more time with this dataset, where do you think you would spend more time?
 
@@ -136,13 +137,9 @@ fastai_options = {
 
 ### Create a line plot showing the top model score for the three (or more) training runs during the project.
 
-TODO: Replace the image below with your own.
-
 ![model_train_score.png](img/model_train_score.png)
 
 ### Create a line plot showing the top kaggle score for the three (or more) prediction submissions during the project.
-
-TODO: Replace the image below with your own.
 
 ![model_test_score.png](img/model_test_score.png)
 
