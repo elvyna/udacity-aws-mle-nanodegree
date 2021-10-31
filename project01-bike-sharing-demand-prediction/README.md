@@ -9,7 +9,7 @@ Students will create a Kaggle account if they do not already have one, download 
 
 After they complete the first workflow, they will iterate on the process by trying to improve their score. This will be accomplished by adding more features to the dataset and tuning some of the hyperparameters available with AutoGluon.
 
-Finally they will submit all their work and write a report detailing which methods provided the best score improvement and why. A template of the report can be found [here](report-template.md).
+Finally they will submit all their work and write a report detailing which methods provided the best score improvement and why. A template of the report can be found [here](template/report-template.md).
 
 To meet specifications, the project will require at least these files:
 * Jupyter notebook with code run to completion
@@ -24,7 +24,7 @@ Images or additional files needed to make your notebook or report complete can b
 <img src="img/sagemaker-studio-git1.png" alt="sagemaker-studio-git1.png" width="500"/>
 <img src="img/sagemaker-studio-git2.png" alt="sagemaker-studio-git2.png" width="500"/>
 
-* Proceed with the project within the [jupyter notebook](project-template.ipynb).
+* Proceed with the project within the [jupyter notebook](template/project-template.ipynb).
 * Visit the [Kaggle Bike Sharing Demand Competition](https://www.kaggle.com/c/bike-sharing-demand) page. There you will see the overall details about the competition including overview, data, code, discussion, leaderboard, and rules. You will primarily be focused on the data and ranking sections.
 
 ### Dependencies
