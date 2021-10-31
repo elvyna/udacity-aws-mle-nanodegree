@@ -13,10 +13,10 @@ Using the original feature set and the instructions for AutoGluon training set u
 I haven't found if we can figure out what the underlying models under the Weighted Ensemble model, but it has the following hyperparameters (we use the default hyperparameters - without any hyperparameter optimisation):
 ```json
 {
-    'use_orig_features': False,
-    'max_base_models': 25,
-    'max_base_models_per_type': 5,
-    'save_bag_folds': True
+    "use_orig_features": False,
+    "max_base_models": 25,
+    "max_base_models_per_type": 5,
+    "save_bag_folds": True
 }
 ```
 
@@ -31,13 +31,22 @@ To get a high level understanding of the data, we aggregate the hourly data into
 
 ![plot-daily-demand.png](img/report/train-actual-demand-daily.png)
 
-Based on the Pearson correlation, we observe moderately positive correlation between bike sharing demand and hour of day, which makes sense - people might rent bike when they have to commute for work. We categorise the hour of day into several categories: morning commute (7 to 9 AM), lunch time (11 AM to 1 PM), evening commute (5 to 6 PM), and the rest as "others".
+Based on the Pearson correlation, we observe moderately positive correlation between bike sharing demand and hour of day, which makes sense - people might rent bike when they have to commute for work. 
 
 ![heatmap-correlation-matrix.png](img/report/heatmap-correlation-matrix.png)
 
 Note: `casual` and `registered` have strong correlation with the demand, which make sense since these columns represents the number of non-registered and registered users that rent the bike. We don't use them for model training.
 
-Aside from adding features, we also change the data type of categorical and boolean variables: `season`, `weather`, `holiday`, `workingday`, and `day_of_week`.
+Temperature (`temp` and `atemp`) also has a positive correlation with the bike sharing demand. In contrast, humidity is negatively correlated with the demand. Generally, day with a higher windspeed has a lower demand - however, there are some extreme values.
+
+![scatterplot-lm.png](img/report/scatterplot-lm.png)
+
+
+We categorise the hour of day into several categories: morning commute (7 to 9 AM), lunch time (11 AM to 1 PM), evening commute (5 to 6 PM), and the rest as "others". We also change the data type of categorical and boolean variables: `season`, `weather`, `holiday`, `workingday`, and `day_of_week`.
+
+On working days, demand at the evening and morning commute are higher; whereas on weekends, demand are higher around lunch time and other hours.
+![displot-working-day-hour-activity.png](img/report/displot-working-day-hour-activity.png)
+
 
 ### How much better did your model perform after adding additional features and why do you think that is?
 
