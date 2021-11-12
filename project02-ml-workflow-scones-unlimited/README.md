@@ -1,5 +1,31 @@
 # Build a ML Workflow For Scones Unlimited On Amazon SageMaker
 
+## Description
+
+In this project, we use pretrained image classification model from Sagemaker to identify bicycle or motorbike images. The images are retrieved from [CIFAR dataset](https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz).
+
+The model is trained using Sagemaker Training job, with data capture and model monitoring configured to identify changes in the input data and model performance. To automate the process, we use Step Function to orchestrate several Lambda functions:
+1. Encode input image to base64
+2. Pass the encoded image to the model endpoint
+3. Validate whether the inference passes the confidence threshold
+
+Detailed descriptions are available on `workspace/project-notebook.ipynb`.
+
+
+## Project Directory
+
+```
+├── README.md          <- description of the repo
+├── img                <- images included in the project notebook or README file
+│
+├── src                <- scripts
+│   ├── lambda         <- lambda functions
+│   └── step-function  <- step function definition
+│
+└── workspace          <- contain project notebook (and relevant files generated from it)
+```
+
+
 ## Rubric
 
 Copied from the Udacity project rubric.
