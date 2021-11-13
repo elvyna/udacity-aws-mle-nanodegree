@@ -9,6 +9,12 @@ The model is trained using Sagemaker Training job, with data capture and model m
 2. Pass the encoded image to the model endpoint
 3. Validate whether the inference passes the confidence threshold
 
+Following are examples of the step function executions:
+
+![sample-working-step-function](img/step-function-test01-motorcycle_s_001936.png)
+
+![sample-working-step-function-failure](img/step-function-test07-threshold-99-bike_s_000694.png)
+
 Detailed descriptions are available on `workspace/project-notebook.ipynb`.
 
 
@@ -16,7 +22,7 @@ Detailed descriptions are available on `workspace/project-notebook.ipynb`.
 
 ```
 ├── README.md          <- description of the repo
-├── img                <- images included in the project notebook or README file
+├── img                <- screenshots of the working step functions
 │
 ├── src                <- scripts
 │   ├── lambda         <- lambda functions
@@ -34,25 +40,25 @@ Copied from the Udacity project rubric.
 
 - [x] Setup a SageMaker studio and a kernel to run this project
 - [x] Students have completed the ETL (extract, transform, load) section of the starter code
-- [ ] Students have successfully completed the Model training section up to “Getting ready to deploy”, showing they trained an image classification model
-- [ ] Students have successfully completed the “Getting ready to deploy” section, showing they have deployed a trained ML model
-- [ ] Students have a unique model endpoint name printed in their notebook for use later in the project
-- [ ] Successfully made predictions using a sample image
+- [x] Students have successfully completed the Model training section up to “Getting ready to deploy”, showing they trained an image classification model
+- [x] Students have successfully completed the “Getting ready to deploy” section, showing they have deployed a trained ML model
+- [x] Students have a unique model endpoint name printed in their notebook for use later in the project
+- [x] Successfully made predictions using a sample image
 
 ### Build a full machine learning workflow
 
-- [ ] Students have authored three lambda functions & have saved their code for each lambda function in a python script.
-  - [ ] 1st lambda is responsible for return an object to step function as `image_data` in an event
-  - [ ] 2nd lambda is responsible for image classification
-  - [ ] 3rd lambda is responsible for filtering low-confidence inferences
-- [ ] Compose Lambdas together in a Step Function
-- [ ] Students will have a JSON export that defines the Step Function
-- [ ] Students have a screenshot of the working Step Function
+- [x] Students have authored three lambda functions & have saved their code for each lambda function in a python script.
+  - [x] 1st lambda is responsible for return an object to step function as `image_data` in an event
+  - [x] 2nd lambda is responsible for image classification
+  - [x] 3rd lambda is responsible for filtering low-confidence inferences
+- [x] Compose Lambdas together in a Step Function
+- [x] Students will have a JSON export that defines the Step Function
+- [x] Students have a screenshot of the working Step Function
 
 ### Monitor the model for errors
 
-- [ ] Students load the data from Model Monitor into their notebook
-- [ ] Students create their own visualization of the Model Monitor data outputs
+- [x] Students load the data from Model Monitor into their notebook
+- [x] Students create their own visualization of the Model Monitor data outputs
 
 ## Suggestions to Make Your Project Stand Out
 

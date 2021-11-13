@@ -4,7 +4,7 @@ import base64
 from sagemaker.serializers import IdentitySerializer
 
 # Fill this in with the name of your deployed model
-ENDPOINT = "" ## TODO: fill in
+ENDPOINT = "image-classification-2021-11-13-09-11-15-598" ## TODO: fill in
 
 def lambda_handler(event, context):
 
@@ -20,12 +20,8 @@ def lambda_handler(event, context):
     # For this model the IdentitySerializer needs to be "image/png"
     predictor.serializer = IdentitySerializer("image/png")
 
-    predictor.serializer = IdentitySerializer("image/png")
-    with open(f"./{event['s3_key']}", "rb") as f:
-        payload = f.read()
-
     # Make a prediction:
-    inferences = predictor.predict(payload) ## TODO: fill in
+    inferences = predictor.predict(image) ## TODO: fill in
 
     # We return the data back to the Step Function    
     event["inferences"] = inferences.decode('utf-8')

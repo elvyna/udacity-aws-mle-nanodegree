@@ -16,7 +16,7 @@ def lambda_handler(event, context):
     s3.download_file(bucket, key, file_name) ## TODO: fill in
 
     # We read the data from a file
-    with open("/tmp/image.png", "rb") as f:
+    with open(file_name, "rb") as f:
         image_data = base64.b64encode(f.read())
 
     # Pass the data back to the Step Function
