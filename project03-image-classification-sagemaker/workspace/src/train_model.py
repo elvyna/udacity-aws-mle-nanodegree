@@ -47,7 +47,7 @@ def main(args):
     '''
     TODO: Initialize a model by calling the net function
     '''
-    model=net()
+    model = net()
     
     '''
     TODO: Create your loss and optimizer
