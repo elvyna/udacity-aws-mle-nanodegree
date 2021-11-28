@@ -26,3 +26,7 @@ Remember that your README should:
 
 ## Debugging and Profiling
 **TODO**: Give an overview of how you performed model debugging and profiling in Sagemaker
+
+# References
+
+- [Building your own algorithm container](https://notebooks.githubusercontent.com/view/ipynb?browser=chrome&color_mode=light&commit=ee8371c5185def1303ede5880331f71cdf68ef6e&device=unknown_device&enc_url=68747470733a2f2f7261772e67697468756275736572636f6e74656e742e636f6d2f6177732f616d617a6f6e2d736167656d616b65722d6578616d706c65732f656538333731633531383564656631333033656465353838303333316637316364663638656636652f616476616e6365645f66756e6374696f6e616c6974792f7363696b69745f6272696e675f796f75725f6f776e2f7363696b69745f6272696e675f796f75725f6f776e2e6970796e62&logged_in=true&nwo=aws%2Famazon-sagemaker-examples&path=advanced_functionality%2Fscikit_bring_your_own%2Fscikit_bring_your_own.ipynb&platform=linux&repository_id=107937815&repository_type=Repository&version=96#An-overview-of-Docker)

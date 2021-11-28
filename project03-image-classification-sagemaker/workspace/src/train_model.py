@@ -11,7 +11,7 @@ import torchvision.transforms as transforms
 import argparse
 
 
-#TODO: Import dependencies for Debugging andd Profiling
+#TODO: Import dependencies for Debugging and Profiling
 
 def test(model, test_loader):
     '''
@@ -77,6 +77,6 @@ if __name__=='__main__':
     TODO: Specify any training args that you might need
     '''
     
-    args=parser.parse_args()
+    args = parser.parse_args()
     
     main(args)

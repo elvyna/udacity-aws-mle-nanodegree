@@ -11,6 +11,7 @@ import torchvision.transforms as transforms
 
 import argparse
 import logging 
+import os
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -69,7 +70,8 @@ def net():
     TODO: Complete this function that initializes your model
           Remember to use a pretrained model
     '''
-    model = models.vgg16(pretrained=True)
+    # model = models.vgg16(pretrained=True)
+    model = models.resnet18(pretrained=True)
     
     for param in model.parameters():
         param.requires_grad = False 
@@ -86,7 +88,9 @@ def create_data_loaders(data, batch_size):
     This is an optional function that you may or may not need to implement
     depending on whether you need to use data loaders or not
     '''
+    logger.info("Preparing data loader ...")
     data_loader = torch.utils.data.DataLoader(data, batch_size)
+    logger.info(data_loader) ## to understand the output shape
     return data_loader
 
 def main(args):
@@ -105,21 +109,21 @@ def main(args):
     TODO: Call the train function to start training your model
     Remember that you will need to set up a way to get training data from S3
     '''
-    input_train_data = '' ## TO DO
+    input_train_data = args.training_input ## TO DO
     train_loader = create_data_loaders(input_train_data, batch_size=args.batch_size)
     model = train(model, train_loader, loss_criterion, optimizer)
     
     '''
     TODO: Test the model to see its accuracy
     '''
-    input_test_data = '' ## TO DO: put the validation data here, for hp tuning
+    input_test_data = args.validation_input ## TO DO: put the validation data here, for hp tuning
     test_loader = create_data_loaders(input_test_data, batch_size=args.batch_size)
     test(model, test_loader, loss_criterion)
     
     '''
     TODO: Save the trained model
     '''
-    path = '' ## TO DO: save to s3 bucket
+    path = args.model_output_dir ## TO DO: save to s3 bucket
     torch.save(model, path)
 
 if __name__=='__main__':
@@ -127,7 +131,24 @@ if __name__=='__main__':
     '''
     TODO: Specify all the hyperparameters you need to use to train your model.
     '''
-    
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=64,
+        metavar="N",
+        help="input batch size for training (default: 64)",
+    )
+    parser.add_argument(
+        "--lr", type=float, default=0.01, metavar="LR", help="learning rate (default: 0.01)"
+    )
+    parser.add_argument(
+        "--model-output-dir", 
+        type=str, 
+        default=os.environ["SM_MODEL_DIR"], 
+        help="Define where the best model object from hp tuning is stored"
+    )
+    parser.add_argument("--training-input", type=str, default=os.environ["SM_CHANNEL_TRAIN"])
+    parser.add_argument("--validation-input", type=str, default=os.environ["SM_CHANNEL_VALIDATION"])
     args = parser.parse_args()
     
     main(args)
