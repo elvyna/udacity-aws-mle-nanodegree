@@ -13,8 +13,10 @@ import argparse
 import logging 
 import os
 
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True ## to avoid truncated image error; fill with grey
+
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
 def test(model, test_loader, criterion):
     '''
@@ -28,7 +30,7 @@ def test(model, test_loader, criterion):
     with torch.no_grad():
         for data, target in test_loader:
             output = model(data)
-            test_loss += criterion(output, target, size_average=False).item()
+            test_loss += criterion(output, target).item()
             # test_loss += F.nll_loss(output, target, size_average=False).item()  # sum up batch loss
             pred = output.max(1, keepdim=True)[1]  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
@@ -83,14 +85,47 @@ def net():
     )
     return model
 
-def create_data_loaders(data, batch_size):
+def create_data_loaders(dataset_directory: str, input_type: str, batch_size: int):
     '''
     This is an optional function that you may or may not need to implement
     depending on whether you need to use data loaders or not
     '''
-    logger.info("Preparing data loader ...")
-    data_loader = torch.utils.data.DataLoader(data, batch_size)
-    logger.info(data_loader) ## to understand the output shape
+    assert input_type in ["train","test"], f"{input_type} must be either 'train' or 'test'!"
+    ## TO DO
+    ## prepare function to read images in the directory
+    ## read them as numpy array
+    ## then transform them using torch transform
+    if input_type == "train":
+        data_transform = transforms.Compose([
+            transforms.RandomResizedCrop(size=(224,224)),  ## shouldn't be done if it's test set
+            transforms.RandomHorizontalFlip(), ## shouldn't be done if it's test set
+            transforms.ToTensor(),
+            transforms.Normalize(
+                [0.485, 0.456, 0.406],
+                [0.229, 0.224, 0.225]
+            )
+        ])
+    else:
+        data_transform = transforms.Compose([
+            transforms.Resize(size=(224,224)),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                [0.485, 0.456, 0.406],
+                [0.229, 0.224, 0.225]
+            )
+        ])
+
+    image_datasets = torchvision.datasets.ImageFolder(
+        dataset_directory,
+        data_transform
+    )
+
+    data_loader = torch.utils.data.DataLoader(
+        image_datasets, 
+        batch_size=batch_size, 
+        shuffle=True
+    )
+
     return data_loader
 
 def main(args):
@@ -110,20 +145,31 @@ def main(args):
     Remember that you will need to set up a way to get training data from S3
     '''
     input_train_data = args.training_input ## TO DO
-    train_loader = create_data_loaders(input_train_data, batch_size=args.batch_size)
+    train_loader = create_data_loaders(
+        dataset_directory=input_train_data, 
+        input_type="train",
+        batch_size=args.batch_size
+    )
     model = train(model, train_loader, loss_criterion, optimizer)
     
     '''
     TODO: Test the model to see its accuracy
     '''
     input_test_data = args.validation_input ## TO DO: put the validation data here, for hp tuning
-    test_loader = create_data_loaders(input_test_data, batch_size=args.batch_size)
+    test_loader = create_data_loaders(
+        dataset_directory=input_test_data, 
+        input_type="test",
+        batch_size=args.batch_size
+    )
     test(model, test_loader, loss_criterion)
     
     '''
     TODO: Save the trained model
     '''
-    path = args.model_output_dir ## TO DO: save to s3 bucket
+    path = os.path.join(
+        args.model_output_dir,
+        "model.tar.gz"
+    ) ## TO DO: save to s3 bucket
     torch.save(model, path)
 
 if __name__=='__main__':
