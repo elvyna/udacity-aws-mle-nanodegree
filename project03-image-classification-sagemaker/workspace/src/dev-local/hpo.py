@@ -21,6 +21,10 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True ## to avoid truncated image error; fill w
 
 logger = logging.getLogger(__name__)
 
+device = torch.device(
+    'cuda:0' if torch.cuda.is_available() else 'cpu'
+)
+
 def extract_dataset_metadata(dataset_directory: str) -> pd.DataFrame:
     """
     Extract target class, file name, and full file path of the provided dataset directory
@@ -96,24 +100,33 @@ def train(model, train_loader, criterion, optimizer):
 
     return model
     
-def net():
+def net(pretrained_model: str, target_class_count: int):
     """
     Initialise pretrained model and adjust the final layer.
 
     :return: PyTorch model
     :rtype: [type]
     """
-    # model = models.vgg16(pretrained=True)
-    model = models.resnet18(pretrained=True)
+    if pretrained_model == 'vgg16':
+        model = models.vgg16(pretrained=True)
+        for param in model.parameters():
+            param.requires_grad = False 
+
+        num_features = model.classifier[-1].in_features
+        features = list(model.classifier.children())[:-1] # Remove last layer
+        features.extend([nn.Linear(num_features, target_class_count)]) # Add our layer with 4 outputs
+        model.classifier = nn.Sequential(*features) # Replace the model classifier
+    elif pretrained_model == 'resnet18':
+        model = models.resnet18(pretrained=True)
+        for param in model.parameters():
+            param.requires_grad = False 
+
+        num_features = model.fc.in_features
+        ## add fully-connected layer
+        model.fc = nn.Sequential(
+            nn.Linear(num_features, target_class_count)
+        )
     
-    for param in model.parameters():
-        param.requires_grad = False 
-    
-    ## add fully-connected layer
-    num_features = model.fc.in_features
-    model.fc = nn.Sequential(
-        nn.Linear(num_features, 133)
-    )
     return model
 
 def create_data_loaders(dataset_directory: str, input_type: str, batch_size: int):
@@ -161,7 +174,9 @@ def main(args):
     '''
     TODO: Initialize a model by calling the net function
     '''
-    model = net()
+    # model = net(pretrained_model="resnet18", target_class_count=args.target_class_count)
+    model = net(pretrained_model="vgg16", target_class_count=args.target_class_count)
+    model = model.to(device)
     
     '''
     TODO: Create your loss and optimizer
@@ -215,6 +230,9 @@ if __name__=='__main__':
     )
     parser.add_argument(
         "--lr", type=float, default=0.01, metavar="LR", help="learning rate (default: 0.01)"
+    )
+    parser.add_argument(
+        "--target_class_count", type=int, default=133, help="number of target classes (default: 133)"
     )
     parser.add_argument(
         "--model-output-dir", 
