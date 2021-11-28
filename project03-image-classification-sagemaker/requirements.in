@@ -1,0 +1,9 @@
+sagemaker
+smdebug
+torch
+boto3
+numpy
+pandas
+seaborn
+torchvision
+tqdm
