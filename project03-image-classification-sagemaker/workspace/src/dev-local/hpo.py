@@ -80,7 +80,7 @@ def test(model, test_loader, criterion):
         )
     )
 
-def train(model, train_loader, criterion, optimizer):
+def train(model, train_loader, criterion, optimizer, epoch):
     '''
     TODO: Complete this function that can take a model and
           data loaders for training and will get train the model
@@ -94,8 +94,8 @@ def train(model, train_loader, criterion, optimizer):
         loss.backward()
         optimizer.step()
         logger.info(
-            "Train batch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
-                batch_idx,
+            "Train epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                epoch,
                 batch_idx * len(data),
                 len(train_loader.dataset),
                 100.0 * batch_idx / len(train_loader),
@@ -199,7 +199,6 @@ def main(args):
         input_type="train",
         batch_size=args.batch_size
     )
-    model = train(model, train_loader, loss_criterion, optimizer)
     
     '''
     TODO: Test the model to see its accuracy
@@ -208,9 +207,13 @@ def main(args):
     test_loader = create_data_loaders(
         dataset_directory=input_test_data, 
         input_type="test",
-        batch_size=args.batch_size
+        batch_size=args.test_batch_size
     )
     test(model, test_loader, loss_criterion)
+
+    for epoch in range(1, args.epochs + 1):
+        train(model, train_loader, loss_criterion, optimizer, epoch=epoch)
+        test(model, test_loader, loss_criterion)
     
     '''
     TODO: Save the trained model
@@ -234,7 +237,21 @@ if __name__=='__main__':
         help="input batch size for training (default: 64)",
     )
     parser.add_argument(
+        "--test-batch-size",
+        type=int,
+        default=1000,
+        metavar="N",
+        help="input batch size for testing (default: 1000)",
+    )
+    parser.add_argument(
         "--lr", type=float, default=0.01, metavar="LR", help="learning rate (default: 0.01)"
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=3, # 10,
+        metavar="N",
+        help="number of epochs to train (default: 10)",
     )
     parser.add_argument(
         "--target-class-count", type=int, default=133, help="number of target classes (default: 133)"
