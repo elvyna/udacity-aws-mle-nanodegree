@@ -16,16 +16,27 @@ from tqdm import tqdm
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True ## to avoid truncated image error; fill with grey
 
+import smdebug.pytorch as smd
+# from smdebug import modes
+# from smdebug.profiler.utils import str2bool
+# from smdebug.pytorch import get_hook
+
+logging.basicConfig(
+    format="%(filename)s %(asctime)s %(levelname)s Line no: %(lineno)d %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S%z",
+    level=logging.INFO,
+)
 logger = logging.getLogger(__name__)
 
 #TODO: Import dependencies for Debugging and Profiling
 
-def test(model, test_loader, criterion):
+def test(model, test_loader, criterion, hook):
     '''
     TODO: Complete this function that can take a model and a 
           testing data loader and will get the test accuray/loss of the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+    hook.set_mode(smd.modes.EVAL)
     model.eval()
     test_loss = 0
     correct = 0
@@ -44,54 +55,47 @@ def test(model, test_loader, criterion):
         )
     )
 
-def train(model, train_loader, criterion, optimizer):
+def train(model, train_loader, criterion, optimizer, epoch, hook):
     '''
     TODO: Complete this function that can take a model and
           data loaders for training and will get train the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+    hook.set_mode(smd.modes.TRAIN)
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
         output = model(data)
-        # loss = F.nll_loss(output, target)
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
-        if batch_idx % 100 == 0:
-            logger.info(
-                "Train batch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
-                    batch_idx,
-                    batch_idx * len(data),
-                    len(train_loader.dataset),
-                    100.0 * batch_idx / len(train_loader),
-                    loss.item(),
-                )
+        logger.info(
+            "Train epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                epoch,
+                batch_idx * len(data),
+                len(train_loader.dataset),
+                100.0 * batch_idx / len(train_loader),
+                loss.item(),
             )
+        )
 
     return model
     
-def net():
-    '''
-    TODO: Complete this function that initializes your model
-          Remember to use a pretrained model
-    '''
+def net(target_class_count: int):
     """
     Initialise pretrained model and adjust the final layer.
 
     :return: PyTorch model
     :rtype: [type]
     """
-    # model = models.vgg16(pretrained=True)
-    model = models.resnet18(pretrained=True)
-    
+    model = models.vgg16(pretrained=True)
     for param in model.parameters():
         param.requires_grad = False 
+
+    num_features = model.classifier[-1].in_features
+    features = list(model.classifier.children())[:-1] # remove the last layer from pretrained model
+    features.extend([nn.Linear(num_features, target_class_count)]) # add final layer with n output classes
+    model.classifier = nn.Sequential(*features) # replace the model classifier
     
-    ## add fully-connected layer
-    num_features = model.fc.in_features
-    model.fc = nn.Sequential(
-        nn.Linear(num_features, 133)
-    )
     return model
 
 def create_data_loaders(dataset_directory: str, input_type: str, batch_size: int):
@@ -138,7 +142,7 @@ def main(args):
     '''
     TODO: Initialize a model by calling the net function
     '''
-    model = net()
+    model = net(target_class_count=args.target_class_count)
     
     '''
     TODO: Create your loss and optimizer
@@ -156,7 +160,6 @@ def main(args):
         input_type="train",
         batch_size=args.batch_size
     )
-    model = train(model, train_loader, loss_criterion, optimizer)
     
     '''
     TODO: Test the model to see its accuracy
@@ -168,6 +171,15 @@ def main(args):
         batch_size=args.batch_size
     )
     test(model, test_loader, loss_criterion)
+
+    ## register the SMDebug hook to save output tensors
+    hook = smd.Hook.create_from_json_file()
+    hook.register_hook(model)
+
+    for epoch in range(1, args.epochs + 1):
+        # pass the SMDebug hook to the train and test functions
+        train(model, train_loader, loss_criterion, optimizer, epoch=epoch, hook=hook)
+        test(model, test_loader, loss_criterion)
     
     '''
     TODO: Save the trained model
@@ -191,7 +203,24 @@ if __name__=='__main__':
         help="input batch size for training (default: 64)",
     )
     parser.add_argument(
+        "--test-batch-size",
+        type=int,
+        default=1000,
+        metavar="N",
+        help="input batch size for testing (default: 1000)",
+    )
+    parser.add_argument(
         "--lr", type=float, default=0.01, metavar="LR", help="learning rate (default: 0.01)"
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=10,
+        metavar="N",
+        help="number of epochs to train (default: 10)",
+    )
+    parser.add_argument(
+        "--target-class-count", type=int, default=133, help="number of target classes (default: 133)"
     )
     parser.add_argument(
         "--model-output-dir", 
