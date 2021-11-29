@@ -16,6 +16,11 @@ from tqdm import tqdm
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True ## to avoid truncated image error; fill with grey
 
+logging.basicConfig(
+    format="%(filename)s %(asctime)s %(levelname)s Line no: %(lineno)d %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S%z",
+    level=logging.INFO,
+)
 logger = logging.getLogger(__name__)
 
 #TODO: Import dependencies for Debugging and Profiling
@@ -57,41 +62,34 @@ def train(model, train_loader, criterion, optimizer):
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
-        if batch_idx % 100 == 0:
-            logger.info(
-                "Train batch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
-                    batch_idx,
-                    batch_idx * len(data),
-                    len(train_loader.dataset),
-                    100.0 * batch_idx / len(train_loader),
-                    loss.item(),
-                )
+        logger.info(
+            "Train batch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                batch_idx,
+                batch_idx * len(data),
+                len(train_loader.dataset),
+                100.0 * batch_idx / len(train_loader),
+                loss.item(),
             )
+        )
 
     return model
     
-def net():
-    '''
-    TODO: Complete this function that initializes your model
-          Remember to use a pretrained model
-    '''
+def net(target_class_count: int):
     """
     Initialise pretrained model and adjust the final layer.
 
     :return: PyTorch model
     :rtype: [type]
     """
-    # model = models.vgg16(pretrained=True)
-    model = models.resnet18(pretrained=True)
-    
+    model = models.vgg16(pretrained=True)
     for param in model.parameters():
         param.requires_grad = False 
+
+    num_features = model.classifier[-1].in_features
+    features = list(model.classifier.children())[:-1] # remove the last layer from pretrained model
+    features.extend([nn.Linear(num_features, target_class_count)]) # add final layer with n output classes
+    model.classifier = nn.Sequential(*features) # replace the model classifier
     
-    ## add fully-connected layer
-    num_features = model.fc.in_features
-    model.fc = nn.Sequential(
-        nn.Linear(num_features, 133)
-    )
     return model
 
 def create_data_loaders(dataset_directory: str, input_type: str, batch_size: int):
@@ -138,7 +136,7 @@ def main(args):
     '''
     TODO: Initialize a model by calling the net function
     '''
-    model = net()
+    model = net(target_class_count=args.target_class_count)
     
     '''
     TODO: Create your loss and optimizer
@@ -192,6 +190,9 @@ if __name__=='__main__':
     )
     parser.add_argument(
         "--lr", type=float, default=0.01, metavar="LR", help="learning rate (default: 0.01)"
+    )
+    parser.add_argument(
+        "--target-class-count", type=int, default=133, help="number of target classes (default: 133)"
     )
     parser.add_argument(
         "--model-output-dir", 

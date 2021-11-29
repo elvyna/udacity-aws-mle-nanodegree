@@ -10,7 +10,8 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 
 import argparse
-import logging 
+import logging
+
 import os
 from tqdm import tqdm
 import pandas as pd
@@ -19,6 +20,11 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True ## to avoid truncated image error; fill with grey
 ## reference: https://stackoverflow.com/questions/12984426/pil-ioerror-image-file-truncated-with-big-images
 
+logging.basicConfig(
+    format="%(filename)s %(asctime)s %(levelname)s Line no: %(lineno)d %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S%z",
+    level=logging.INFO,
+)
 logger = logging.getLogger(__name__)
 
 device = torch.device(
@@ -87,16 +93,15 @@ def train(model, train_loader, criterion, optimizer):
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
-        if batch_idx % 100 == 0:
-            logger.info(
-                "Train batch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
-                    batch_idx,
-                    batch_idx * len(data),
-                    len(train_loader.dataset),
-                    100.0 * batch_idx / len(train_loader),
-                    loss.item(),
-                )
+        logger.info(
+            "Train batch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
+                batch_idx,
+                batch_idx * len(data),
+                len(train_loader.dataset),
+                100.0 * batch_idx / len(train_loader),
+                loss.item(),
             )
+        )
 
     return model
     
@@ -174,7 +179,7 @@ def main(args):
     '''
     TODO: Initialize a model by calling the net function
     '''
-    # model = net(pretrained_model="resnet18", target_class_count=args.target_class_count)
+    # model = net(pretrained_model="resnet18", target_class_count=args.target_class_count) ## poor performance
     model = net(pretrained_model="vgg16", target_class_count=args.target_class_count)
     model = model.to(device)
     
@@ -224,7 +229,7 @@ if __name__=='__main__':
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=64,
+        default=64, #16,
         metavar="N",
         help="input batch size for training (default: 64)",
     )
@@ -232,7 +237,7 @@ if __name__=='__main__':
         "--lr", type=float, default=0.01, metavar="LR", help="learning rate (default: 0.01)"
     )
     parser.add_argument(
-        "--target_class_count", type=int, default=133, help="number of target classes (default: 133)"
+        "--target-class-count", type=int, default=133, help="number of target classes (default: 133)"
     )
     parser.add_argument(
         "--model-output-dir", 
