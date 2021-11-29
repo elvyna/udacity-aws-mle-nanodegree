@@ -205,9 +205,9 @@ if __name__=='__main__':
     parser.add_argument(
         "--test-batch-size",
         type=int,
-        default=1000,
+        default=64,
         metavar="N",
-        help="input batch size for testing (default: 1000)",
+        help="input batch size for testing (default: 64)",
     )
     parser.add_argument(
         "--lr", type=float, default=0.01, metavar="LR", help="learning rate (default: 0.01)"
