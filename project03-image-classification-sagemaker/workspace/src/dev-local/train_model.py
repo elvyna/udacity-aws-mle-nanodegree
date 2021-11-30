@@ -164,7 +164,6 @@ def main(args):
         input_type="test",
         batch_size=args.test_batch_size
     )
-    test(model, test_loader, loss_criterion)
 
     for epoch in range(1, args.epochs + 1):
         train(model, train_loader, loss_criterion, optimizer, epoch=epoch)

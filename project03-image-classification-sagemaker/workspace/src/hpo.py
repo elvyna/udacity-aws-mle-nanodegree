@@ -164,7 +164,6 @@ def main(args):
         input_type="test",
         batch_size=args.test_batch_size
     )
-    test(model, test_loader, loss_criterion)
 
     for epoch in range(1, args.epochs + 1):
         model = train(model, train_loader, loss_criterion, optimizer, epoch=epoch)
@@ -204,9 +203,9 @@ if __name__=='__main__':
     parser.add_argument(
         "--epochs",
         type=int,
-        default=10,
+        default=5,
         metavar="N",
-        help="number of epochs to train (default: 10)",
+        help="number of epochs to train (default: 5)",
     )
     parser.add_argument(
         "--target-class-count", type=int, default=133, help="number of target classes (default: 133)"
