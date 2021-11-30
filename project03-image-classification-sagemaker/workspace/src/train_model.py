@@ -17,8 +17,8 @@ from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True ## to avoid truncated image error; fill with grey
 
 import smdebug.pytorch as smd
-# from smdebug import modes
-# from smdebug.profiler.utils import str2bool
+from smdebug import modes
+from smdebug.profiler.utils import str2bool
 # from smdebug.pytorch import get_hook
 
 logging.basicConfig(
@@ -61,6 +61,9 @@ def train(model, train_loader, criterion, optimizer, epoch, hook):
           data loaders for training and will get train the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+    if hook is None:
+        hook = smd.get_hook(create_if_not_exists=True)
+
     hook.set_mode(smd.modes.TRAIN)
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
@@ -170,11 +173,13 @@ def main(args):
         input_type="test",
         batch_size=args.batch_size
     )
-    test(model, test_loader, loss_criterion)
 
     ## register the SMDebug hook to save output tensors
     hook = smd.Hook.create_from_json_file()
     hook.register_hook(model)
+
+    if hook:
+        hook.register_loss(loss_criterion)
 
     for epoch in range(1, args.epochs + 1):
         # pass the SMDebug hook to the train and test functions
@@ -215,9 +220,9 @@ if __name__=='__main__':
     parser.add_argument(
         "--epochs",
         type=int,
-        default=10,
+        default=5,
         metavar="N",
-        help="number of epochs to train (default: 10)",
+        help="number of epochs to train (default: 5)",
     )
     parser.add_argument(
         "--target-class-count", type=int, default=133, help="number of target classes (default: 133)"
