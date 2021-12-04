@@ -141,7 +141,8 @@ def main(args):
     '''
     TODO: Create your loss and optimizer
     '''
-    loss_criterion = nn.NLLLoss()
+#     loss_criterion = nn.NLLLoss()
+    loss_criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     
     '''

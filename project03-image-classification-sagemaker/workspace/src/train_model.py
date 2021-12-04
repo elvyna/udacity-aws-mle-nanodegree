@@ -150,7 +150,8 @@ def main(args):
     '''
     TODO: Create your loss and optimizer
     '''
-    loss_criterion = nn.NLLLoss()
+#     loss_criterion = nn.NLLLoss()
+    loss_criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     
     '''
@@ -171,7 +172,7 @@ def main(args):
     test_loader = create_data_loaders(
         dataset_directory=input_test_data, 
         input_type="test",
-        batch_size=args.batch_size
+        batch_size=args.test_batch_size
     )
 
     ## register the SMDebug hook to save output tensors
@@ -180,11 +181,11 @@ def main(args):
 
     if hook:
         hook.register_loss(loss_criterion)
-
+        
     for epoch in range(1, args.epochs + 1):
         # pass the SMDebug hook to the train and test functions
-        train(model, train_loader, loss_criterion, optimizer, epoch=epoch, hook=hook)
-        test(model, test_loader, loss_criterion)
+        model = train(model, train_loader, loss_criterion, optimizer, epoch=epoch, hook=hook)
+        test(model, test_loader, loss_criterion, hook=hook)
     
     '''
     TODO: Save the trained model
@@ -236,6 +237,6 @@ if __name__=='__main__':
 
     parser.add_argument("--training-input", type=str, default=os.environ["SM_CHANNEL_TRAIN"])
     parser.add_argument("--test-input", type=str, default=os.environ["SM_CHANNEL_TEST"])
-    
     args = parser.parse_args()
+    
     main(args)
