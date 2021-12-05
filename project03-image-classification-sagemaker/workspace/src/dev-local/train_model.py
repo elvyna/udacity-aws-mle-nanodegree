@@ -55,6 +55,8 @@ def train(model, train_loader, criterion, optimizer, epoch):
           data loaders for training and will get train the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+    model.train()
+    
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
         output = model(data)
@@ -141,7 +143,7 @@ def main(args):
     '''
     TODO: Create your loss and optimizer
     '''
-    loss_criterion = nn.NLLLoss()
+    loss_criterion = nn.CrossEntropyLoss() # nn.NLLLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     
     '''

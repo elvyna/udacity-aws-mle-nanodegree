@@ -61,6 +61,8 @@ def train(model, train_loader, criterion, optimizer, epoch, hook):
           data loaders for training and will get train the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+    model.train()
+    
     if hook is None:
         hook = smd.get_hook(create_if_not_exists=True)
 

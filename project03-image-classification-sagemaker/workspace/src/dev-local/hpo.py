@@ -15,6 +15,7 @@ import logging
 import os
 from tqdm import tqdm
 import pandas as pd
+import gc
 
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True ## to avoid truncated image error; fill with grey
@@ -56,7 +57,7 @@ def extract_dataset_metadata(dataset_directory: str) -> pd.DataFrame:
         columns=['target_class', 'file_name', 'full_path']
     )
 
-def test(model, test_loader, criterion):
+def test(model, test_loader, criterion, device=device):
     '''
     TODO: Complete this function that can take a model and a 
           testing data loader and will get the test accuray/loss of the model
@@ -67,11 +68,16 @@ def test(model, test_loader, criterion):
     correct = 0
     with torch.no_grad():
         for data, target in test_loader:
+            ## adjust data format, i.e., if it's on gpu
+            data =  data.to(device)
+
             output = model(data)
-            test_loss += criterion(output, target).item()
+            test_loss += float(criterion(output, target).item())
             # test_loss += F.nll_loss(output, target, size_average=False).item()  # sum up batch loss
             pred = output.max(1, keepdim=True)[1]  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
+
+        del data, target
 
     test_loss /= len(test_loader.dataset)
     logger.info(
@@ -80,13 +86,22 @@ def test(model, test_loader, criterion):
         )
     )
 
-def train(model, train_loader, criterion, optimizer, epoch):
+def train(model, train_loader, criterion, optimizer, epoch, device):
     '''
     TODO: Complete this function that can take a model and
           data loaders for training and will get train the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+    torch.cuda.empty_cache()
+    gc.collect()
+
+    model.train()
+
     for batch_idx, (data, target) in enumerate(train_loader):
+        ## adjust data format, i.e., if it's on gpu
+        data = data.to(device)
+        target = target.to(device)
+
         optimizer.zero_grad()
         output = model(data)
         # loss = F.nll_loss(output, target)
@@ -102,6 +117,8 @@ def train(model, train_loader, criterion, optimizer, epoch):
                 loss.item(),
             )
         )
+
+    del data, target
 
     return model
     
@@ -186,7 +203,7 @@ def main(args):
     '''
     TODO: Create your loss and optimizer
     '''
-    loss_criterion = nn.NLLLoss()
+    loss_criterion = nn.CrossEntropyLoss() # nn.NLLLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     
     '''
@@ -210,9 +227,16 @@ def main(args):
         batch_size=args.test_batch_size
     )
 
+    # input_test_data = args.test_input 
+    # test_loader = create_data_loaders(
+    #     dataset_directory=input_test_data, 
+    #     input_type="test",
+    #     batch_size=args.test_batch_size
+    # )
+
     for epoch in range(1, args.epochs + 1):
-        train(model, train_loader, loss_criterion, optimizer, epoch=epoch)
-        test(model, test_loader, loss_criterion)
+        train(model, train_loader, loss_criterion, optimizer, epoch=epoch, device=device)
+        test(model, test_loader, loss_criterion, device=device)
     
     '''
     TODO: Save the trained model
@@ -231,14 +255,14 @@ if __name__=='__main__':
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=64, #16,
+        default=128, #16,
         metavar="N",
         help="input batch size for training (default: 64)",
     )
     parser.add_argument(
         "--test-batch-size",
         type=int,
-        default=64,
+        default=256,
         metavar="N",
         help="input batch size for testing (default: 64)",
     )
@@ -248,7 +272,7 @@ if __name__=='__main__':
     parser.add_argument(
         "--epochs",
         type=int,
-        default=3, # 10,
+        default=10,
         metavar="N",
         help="number of epochs to train (default: 10)",
     )
@@ -263,9 +287,11 @@ if __name__=='__main__':
     )
     input_train = "workspace/dogImages/dev-local/train"
     input_valid = "workspace/dogImages/dev-local/valid"
+    # input_test = "workspace/dogImages/dev-local/test"
 
     parser.add_argument("--training-input", type=str, default=input_train) # os.environ["SM_CHANNEL_TRAIN"])
     parser.add_argument("--validation-input", type=str, default=input_valid) # os.environ["SM_CHANNEL_VALIDATION"])
+    # parser.add_argument("--test-input", type=str, default=input_test) # os.environ["SM_CHANNEL_TEST"])
     
     args = parser.parse_args()
     
