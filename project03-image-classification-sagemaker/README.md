@@ -24,18 +24,41 @@ Note: find the project starter template [here](https://github.com/udacity/nd009t
 The images are stored in an S3 bucket, then they are passed as inputs to the Sagemaker training jobs.
 
 ![00-s3-data-upload](img/00-s3-data-upload.png)
-
 ![01-s3-bucket-preview](img/01-s3-bucket-preview.png)
 
 ## Hyperparameter tuning and model training
 
-TO DO: *What kind of model did you choose for this experiment and why? Give an overview of the types of parameters and their ranges used for the hyperparameter search*
+Here, we use a pretrained [VGG16](https://neurohive.io/en/popular-networks/vgg16/) model because of its simple structure (not having too deep network architecture) and easy to fine-tune for starters. I also tried fine-tuning [ResNet18](https://pytorch.org/hub/pytorch_vision_resnet/) - which is much faster to train, but didn't get a satisfactory result. VGG16 outperforms ResNet18 in this case, since lower-level features become more important to identify these 133 dog breeds.
 
-Remember that your README should:
-- Include a screenshot of completed training jobs
-- Logs metrics during the training process
-- Tune at least two hyperparameters
-- Retrieve the best best hyperparameters from all your training jobs
+We tune three hyperparameters: training batch size, learning rate, and number of epoch. 
+- The hyperparameter search range for batch size is kept small (since larger batch size requires more computing power, i.e., more expensive instances). 
+- For a similar reason, the number of epochs are also kept small (to avoid longer training process).
+- The search space for learning rate is defined between 0.001 and 0.1. We also use [Adam](https://machinelearningmastery.com/adam-optimization-algorithm-for-deep-learning/) as the optimizer, which adapts the learning rate value while optimizing the objective function.
+
+```py
+hyperparameter_ranges = {
+    "lr": ContinuousParameter(0.001, 0.1),
+    "batch-size": CategoricalParameter([128, 256]),
+    "epochs": CategoricalParameter([5, 7, 10])
+}
+```
+
+The hyperparameter tuning is conducted by finding hyperparameter values that perform the best on the validation set.
+
+![02-hp-tuning-setup](img/02-hp-tuning-setup.png)
+![03-hp-tuning-jobs](img/03-hp-tuning-jobs.png)
+![04-hp-tuning-training-log](img/04-hp-tuning-training-log.png)
+![05-hp-tuning-training-result](img/05-hp-tuning-result-notebook.png)
+
+Following is the best hyperparameter found from the hyperparameter tuner:
+
+```py
+hyperparameters = {
+    "lr": 0.0053945745752048664,
+    "batch-size": 256,
+    "epochs": 7,
+}
+```
 
 ## Model debugging and profiling
 
@@ -46,7 +69,6 @@ Remember that your README should:
 
 **TODO** Remember to provide the profiler html/pdf file in your submission.
 
-
 ## Model Deployment
 **TODO**: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
 
@@ -54,13 +76,3 @@ Remember that your README should:
 
 ## Standout Suggestions
 **TODO (Optional):** This is where you can provide information about any standout suggestions that you have attempted.
-
-
-# References
-
-- [Building your own algorithm container](https://notebooks.githubusercontent.com/view/ipynb?browser=chrome&color_mode=light&commit=ee8371c5185def1303ede5880331f71cdf68ef6e&device=unknown_device&enc_url=68747470733a2f2f7261772e67697468756275736572636f6e74656e742e636f6d2f6177732f616d617a6f6e2d736167656d616b65722d6578616d706c65732f656538333731633531383564656631333033656465353838303333316637316364663638656636652f616476616e6365645f66756e6374696f6e616c6974792f7363696b69745f6272696e675f796f75725f6f776e2f7363696b69745f6272696e675f796f75725f6f776e2e6970796e62&logged_in=true&nwo=aws%2Famazon-sagemaker-examples&path=advanced_functionality%2Fscikit_bring_your_own%2Fscikit_bring_your_own.ipynb&platform=linux&repository_id=107937815&repository_type=Repository&version=96#An-overview-of-Docker)
-- [VGG16](https://www.kaggle.com/carloalbertobarbano/vgg16-transfer-learning-pytorch)
-- [VGG16 Analytics Vidhya](https://www.analyticsvidhya.com/blog/2021/06/transfer-learning-using-vgg16-in-pytorch/)
-- [Dog breed](https://levelup.gitconnected.com/dog-breed-classifier-with-pytorch-using-transfer-learning-8f15af6f9010)
-- [Pretrained examples with Keras](https://machinelearningmastery.com/how-to-use-transfer-learning-when-developing-convolutional-neural-network-models/)
-- [Airy example](https://www.kaggle.com/zscansorted/airy-photo-challenge-transfer-learning-tutorial)
