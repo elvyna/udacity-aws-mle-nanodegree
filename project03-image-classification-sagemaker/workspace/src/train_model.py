@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 #TODO: Import dependencies for Debugging and Profiling
 
-def test(model, test_loader, criterion, hook):
+def test(model, test_loader, criterion, hook, device):
     '''
     TODO: Complete this function that can take a model and a 
           testing data loader and will get the test accuray/loss of the model
@@ -42,9 +42,12 @@ def test(model, test_loader, criterion, hook):
     correct = 0
     with torch.no_grad():
         for data, target in test_loader:
+            ## set to device (e.g. if using GPU)
+            data = data.to(device)
+            target = target.to(device)
+
             output = model(data)
-            test_loss += criterion(output, target).item()
-            # test_loss += F.nll_loss(output, target, size_average=False).item()  # sum up batch loss
+            test_loss += criterion(output, target).item() # sum up batch loss
             pred = output.max(1, keepdim=True)[1]  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
 
@@ -55,7 +58,7 @@ def test(model, test_loader, criterion, hook):
         )
     )
 
-def train(model, train_loader, criterion, optimizer, epoch, hook):
+def train(model, train_loader, criterion, optimizer, epoch, hook, device):
     '''
     TODO: Complete this function that can take a model and
           data loaders for training and will get train the model
@@ -68,6 +71,10 @@ def train(model, train_loader, criterion, optimizer, epoch, hook):
 
     hook.set_mode(smd.modes.TRAIN)
     for batch_idx, (data, target) in enumerate(train_loader):
+        ## set to device (e.g. if using GPU)
+        data = data.to(device)
+        target = target.to(device)
+
         optimizer.zero_grad()
         output = model(data)
         loss = criterion(output, target)
@@ -108,7 +115,7 @@ def create_data_loaders(dataset_directory: str, input_type: str, batch_size: int
     This is an optional function that you may or may not need to implement
     depending on whether you need to use data loaders or not
     '''
-    assert input_type in ["train","test"], f"{input_type} must be either 'train' or 'test'!"
+    assert input_type in ["train","valid","test"], f"{input_type} must be either 'train', 'valid', or 'test'!"
     
     if input_type == "train":
         data_transform = transforms.Compose([
@@ -147,12 +154,16 @@ def main(args):
     '''
     TODO: Initialize a model by calling the net function
     '''
+    device = torch.device(
+        'cuda:0' if torch.cuda.is_available() else 'cpu'
+    )
+
     model = net(target_class_count=args.target_class_count)
+    model = model.to(device)
     
     '''
     TODO: Create your loss and optimizer
     '''
-#     loss_criterion = nn.NLLLoss()
     loss_criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     
@@ -186,8 +197,8 @@ def main(args):
         
     for epoch in range(1, args.epochs + 1):
         # pass the SMDebug hook to the train and test functions
-        model = train(model, train_loader, loss_criterion, optimizer, epoch=epoch, hook=hook)
-        test(model, test_loader, loss_criterion, hook=hook)
+        model = train(model, train_loader, loss_criterion, optimizer, epoch=epoch, hook=hook, device=device)
+        test(model, test_loader, loss_criterion, hook=hook, device=device)
     
     '''
     TODO: Save the trained model
