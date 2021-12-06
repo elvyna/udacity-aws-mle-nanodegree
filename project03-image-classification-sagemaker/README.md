@@ -9,9 +9,13 @@ The repository is structured as follows.
 ```
 ├── README.md          <- description of the repo
 ├── img                <- screenshots for the README
+|
+├── profiler-output    <- output report from Sagemaker Profiling
 │
+├── template           <- project starter files
+|
 ├── workspace          <- scripts and notebook
-│   ├── src            <- training and hp tuning script
+│   ├── src            <- python scripts used in the notebook
 └─  └── project-notebook.ipynb  <- notebook to run scripts as Sagemaker jobs
 ```
 
