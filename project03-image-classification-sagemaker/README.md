@@ -62,17 +62,58 @@ hyperparameters = {
 
 ## Model debugging and profiling
 
-**TODO**: Give an overview of how you performed model debugging and profiling in Sagemaker
+To allow model debugging and profiling for the model training job, we need to define several rules:
+
+```py
+from sagemaker.debugger import Rule, ProfilerRule, rule_configs, DebuggerHookConfig, ProfilerConfig, FrameworkProfile, CollectionConfig
+
+rules = [
+    Rule.sagemaker(rule_configs.loss_not_decreasing()),
+    Rule.sagemaker(rule_configs.overfit()),
+    Rule.sagemaker(rule_configs.overtraining()),
+    Rule.sagemaker(rule_configs.poor_weight_initialization()),
+    ProfilerRule.sagemaker(rule_configs.LowGPUUtilization()),
+    ProfilerRule.sagemaker(rule_configs.ProfilerReport()),
+]
+
+profiler_config = ProfilerConfig(
+    system_monitor_interval_millis=500, framework_profile_params=FrameworkProfile(num_steps=10)
+)
+
+collection_config_list = [
+    CollectionConfig(
+        name="CrossEntropyLoss_output_0",
+        parameters={
+            "include_regex": "CrossEntropyLoss_output_0", 
+            "train.save_interval": "10",
+            "eval.save_interval": "1"
+        }
+    )
+]
+
+hook_config = DebuggerHookConfig(
+    collection_configs=collection_config_list
+)
+```
+
+If we don't define `CollectionConfig`, the Debugger might not capture the defined metric (here, `CrossEntropyLoss_output_0`) for all training steps. 
+
+Then, the `profiler_config` and `hook_config` are passed as additional arguments for the `Estimator`. Aside from setting the arguments, we also have to ensure that the `hook` are set up in the `src/train_model.py`:
+- set the mode to `TRAIN` if it is on the training step
+- set the mode to `EVAL` if it is on the testing step
+
+Read more re CollectionConfigs [here](https://docs.aws.amazon.com/sagemaker/latest/dg/debugger-configure-hook.html).
+
 
 ### Results
-**TODO**: What are the results/insights did you get by profiling/debugging your model?
 
-**TODO** Remember to provide the profiler html/pdf file in your submission.
+![06-model-debugger](img/06-model-debugger.png)
+
+The validation loss is unstable and doesn't decrease as the model is trained with more iterations. It implies that the model might not perform well - we could consider revisiting our hyperparameter search range (e.g., reducing batch size, increasing epochs) and do more hyperparameter tuning. Alternatively, we might consider using different pretrained model, or design the additional layers differently.
+
+I didn't use instance with GPU - that's why we only observe CPU utilizations in the Profiling Report. Overall, there are no issues - none of the profiling rules were triggered. The full report is provided on `profiler-output/profiler-report.html`.
 
 ## Model Deployment
 **TODO**: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
 
 **TODO** Remember to provide a screenshot of the deployed active endpoint in Sagemaker.
-
-## Standout Suggestions
-**TODO (Optional):** This is where you can provide information about any standout suggestions that you have attempted.
