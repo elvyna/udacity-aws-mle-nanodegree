@@ -70,6 +70,7 @@ def test(model, test_loader, criterion, device=device):
         for data, target in test_loader:
             ## adjust data format, i.e., if it's on gpu
             data =  data.to(device)
+            target = target.to(device)
 
             output = model(data)
             test_loss += float(criterion(output, target).item())
@@ -138,6 +139,7 @@ def net(pretrained_model: str, target_class_count: int):
         features = list(model.classifier.children())[:-1] # Remove last layer
         features.extend([nn.Linear(num_features, target_class_count)]) # Add our layer with 4 outputs
         model.classifier = nn.Sequential(*features) # Replace the model classifier
+    
     elif pretrained_model == 'resnet18':
         model = models.resnet18(pretrained=True)
         for param in model.parameters():
@@ -147,6 +149,21 @@ def net(pretrained_model: str, target_class_count: int):
         ## add fully-connected layer
         model.fc = nn.Sequential(
             nn.Linear(num_features, target_class_count)
+        )
+
+    elif pretrained_model == 'resnet50':
+        model = models.resnet50(pretrained=True)
+        for param in model.parameters():
+            param.requires_grad = False 
+
+        num_features = model.fc.in_features
+        ## add fully-connected layer
+        model.fc = nn.Sequential(
+            nn.Linear(num_features, 256),
+            nn.ReLU(inplace=True),
+            nn.Linear(256, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, target_class_count)
         )
     
     return model
@@ -197,7 +214,8 @@ def main(args):
     TODO: Initialize a model by calling the net function
     '''
     # model = net(pretrained_model="resnet18", target_class_count=args.target_class_count) ## poor performance
-    model = net(pretrained_model="vgg16", target_class_count=args.target_class_count)
+    # model = net(pretrained_model="vgg16", target_class_count=args.target_class_count)
+    model = net(pretrained_model="resnet50", target_class_count=args.target_class_count)
     model = model.to(device)
     
     '''
@@ -262,7 +280,7 @@ if __name__=='__main__':
     parser.add_argument(
         "--test-batch-size",
         type=int,
-        default=256,
+        default=64,
         metavar="N",
         help="input batch size for testing (default: 64)",
     )

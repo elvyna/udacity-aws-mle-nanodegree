@@ -83,14 +83,19 @@ def net(target_class_count: int):
     :return: PyTorch model
     :rtype: [type]
     """
-    model = models.vgg16(pretrained=True)
+    model = models.resnet50(pretrained=True)
     for param in model.parameters():
         param.requires_grad = False 
 
-    num_features = model.classifier[-1].in_features
-    features = list(model.classifier.children())[:-1] # remove the last layer from pretrained model
-    features.extend([nn.Linear(num_features, target_class_count)]) # add final layer with n output classes
-    model.classifier = nn.Sequential(*features) # replace the model classifier
+    num_features = model.fc.in_features
+    ## add fully-connected layer
+    model.fc = nn.Sequential(
+        nn.Linear(num_features, 256),
+        nn.ReLU(inplace=True),
+        nn.Linear(256, 128),
+        nn.ReLU(inplace=True),
+        nn.Linear(128, target_class_count)
+    )
     
     return model
 
