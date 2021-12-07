@@ -55,7 +55,6 @@ def model_fn(model_dir):
 
     return model
 
-
 def input_fn(request_body, content_type=JPEG_CONTENT_TYPE):
     assert content_type in [JPEG_CONTENT_TYPE, JSON_CONTENT_TYPE], f"Requested unsupported ContentType in content_type: {content_type}"
     logger.info('Deserializing the input data.')

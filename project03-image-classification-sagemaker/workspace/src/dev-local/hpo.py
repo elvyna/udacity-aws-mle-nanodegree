@@ -243,7 +243,7 @@ def main(args):
     '''
     path = os.path.join(
         args.model_output_dir,
-        "model.pt"
+        "model.pth"
     )
     torch.save(model.state_dict(), path)
 
