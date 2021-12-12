@@ -8,5 +8,5 @@ Find the course materials in the following repositories:
 
 1. [Introduction to Machine Learning](https://github.com/udacity/nd009t-c1-intro-to-ml-templates)
 2. [Developing Your First ML Workflow](https://github.com/udacity/udacity-nd009t-C2-Developing-ML-Workflow)
-3. [Deep Learning Topics with Computer Vision](https://github.com/elvyna/udacity-aws-mle-nanodegree/nd009t-c3-deep-learning-topics-cv-nlp)
-4. [Operationalizing Machine Learning on SageMaker](https://github.com/elvyna/udacity-aws-mle-nanodegree/nd009t-c4-operationalizing-ml-on-sagemaker)
+3. [Deep Learning Topics with Computer Vision](https://github.com/elvyna/udacity-aws-mle-nanodegree/tree/master/nd009t-c3-deep-learning-topics-cv-nlp)
+4. [Operationalizing Machine Learning on SageMaker](https://github.com/elvyna/udacity-aws-mle-nanodegree/tree/master/nd009t-c4-operationalizing-ml-on-sagemaker)
