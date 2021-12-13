@@ -1,4 +1,11 @@
-.ipynb_checkpoints/*
+.ipynb_checkpoints/
 package/
 *.zip
 *.tar.gz
+work-env/
+data/
+.vscode/
+AutogluonModels/
+__pycache__/
+.tempfile
+.workspace-config.json
