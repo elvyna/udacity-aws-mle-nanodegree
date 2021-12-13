@@ -4,22 +4,17 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as F
 import torchvision
 import torchvision.models as models
 import torchvision.transforms as transforms
 
 import argparse
-import os
 import logging 
-from tqdm import tqdm
+import os
 
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True ## to avoid truncated image error; fill with grey
-
-import smdebug.pytorch as smd
-from smdebug import modes
-from smdebug.profiler.utils import str2bool
-# from smdebug.pytorch import get_hook
 
 logging.basicConfig(
     format="%(filename)s %(asctime)s %(levelname)s Line no: %(lineno)d %(message)s",
@@ -28,27 +23,19 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-#TODO: Import dependencies for Debugging and Profiling
-
-def test(model, test_loader, criterion, hook, device):
+def test(model, test_loader, criterion):
     '''
     TODO: Complete this function that can take a model and a 
           testing data loader and will get the test accuray/loss of the model
           Remember to include any debugging/profiling hooks that you might need
     '''
-    hook.set_mode(smd.modes.EVAL)
     model.eval()
     test_loss = 0
     correct = 0
     with torch.no_grad():
         for data, target in test_loader:
-            ## set to device (e.g. if using GPU)
-            data = data.to(device)
-            target = target.to(device)
-
             output = model(data)
             test_loss += criterion(output, target).item()
-            # test_loss += F.nll_loss(output, target, size_average=False).item()  # sum up batch loss
             pred = output.max(1, keepdim=True)[1]  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
 
@@ -59,25 +46,17 @@ def test(model, test_loader, criterion, hook, device):
         )
     )
 
-def train(model, train_loader, criterion, optimizer, epoch, hook, device):
+def train(model, train_loader, criterion, optimizer, epoch):
     '''
     TODO: Complete this function that can take a model and
           data loaders for training and will get train the model
           Remember to include any debugging/profiling hooks that you might need
     '''
     model.train()
-    
-    if hook is None:
-        hook = smd.get_hook(create_if_not_exists=True)
-
-    hook.set_mode(smd.modes.TRAIN)
     for batch_idx, (data, target) in enumerate(train_loader):
-        ## set to device (e.g. if using GPU)
-        data = data.to(device)
-        target = target.to(device)
-
         optimizer.zero_grad()
         output = model(data)
+        # loss = F.nll_loss(output, target)
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
@@ -117,7 +96,10 @@ def create_data_loaders(dataset_directory: str, input_type: str, batch_size: int
     depending on whether you need to use data loaders or not
     '''
     assert input_type in ["train","test"], f"{input_type} must be either 'train' or 'test'!"
-    
+    ## TO DO
+    ## prepare function to read images in the directory
+    ## read them as numpy array
+    ## then transform them using torch transform
     if input_type == "train":
         data_transform = transforms.Compose([
             transforms.RandomResizedCrop(size=(224,224)),  ## shouldn't be done if it's test set
@@ -155,16 +137,12 @@ def main(args):
     '''
     TODO: Initialize a model by calling the net function
     '''
-    device = torch.device(
-        'cuda:0' if torch.cuda.is_available() else 'cpu'
-    )
-
     model = net(target_class_count=args.target_class_count)
-    model = model.to(device)
     
     '''
     TODO: Create your loss and optimizer
     '''
+#     loss_criterion = nn.NLLLoss()
     loss_criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     
@@ -182,24 +160,16 @@ def main(args):
     '''
     TODO: Test the model to see its accuracy
     '''
-    input_test_data = args.test_input ## TO DO: put the test data here
+    input_test_data = args.validation_input ## TO DO: put the validation data here, for hp tuning
     test_loader = create_data_loaders(
         dataset_directory=input_test_data, 
         input_type="test",
         batch_size=args.test_batch_size
     )
 
-    ## register the SMDebug hook to save output tensors
-    hook = smd.Hook.create_from_json_file()
-    hook.register_hook(model)
-
-    if hook:
-        hook.register_loss(loss_criterion)
-        
     for epoch in range(1, args.epochs + 1):
-        # pass the SMDebug hook to the train and test functions
-        model = train(model, train_loader, loss_criterion, optimizer, epoch=epoch, hook=hook, device=device)
-        test(model, test_loader, loss_criterion, hook=hook, device=device)
+        model = train(model, train_loader, loss_criterion, optimizer, epoch=epoch)
+        test(model, test_loader, loss_criterion)
     
     '''
     TODO: Save the trained model
@@ -211,9 +181,9 @@ def main(args):
     torch.save(model.state_dict(), path)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     '''
-    TODO: Specify any training args that you might need
+    TODO: Specify all the hyperparameters you need to use to train your model.
     '''
     parser.add_argument(
         "--batch-size",
@@ -248,9 +218,8 @@ if __name__=='__main__':
         default=os.environ["SM_MODEL_DIR"], 
         help="Define where the best model object from hp tuning is stored"
     )
-
     parser.add_argument("--training-input", type=str, default=os.environ["SM_CHANNEL_TRAIN"])
-    parser.add_argument("--test-input", type=str, default=os.environ["SM_CHANNEL_TEST"])
+    parser.add_argument("--validation-input", type=str, default=os.environ["SM_CHANNEL_VALIDATION"])
     args = parser.parse_args()
     
     main(args)

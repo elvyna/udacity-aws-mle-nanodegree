@@ -173,7 +173,7 @@ def main(args):
     )
 
     for epoch in range(1, args.epochs + 1):
-        train(model, train_loader, loss_criterion, optimizer, epoch=epoch)
+        model = train(model, train_loader, loss_criterion, optimizer, epoch=epoch)
         test(model, test_loader, loss_criterion)
     
     '''

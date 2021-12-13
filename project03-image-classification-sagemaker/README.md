@@ -118,6 +118,54 @@ The validation loss is unstable and doesn't decrease as the model is trained wit
 I didn't use instance with GPU - that's why we only observe CPU utilizations in the Profiling Report. Overall, there are no issues - none of the profiling rules were triggered. The full report is provided on `profiler-output/profiler-report.html`.
 
 ## Model Deployment
-**TODO**: Give an overview of the deployed model and instructions on how to query the endpoint with a sample input.
 
-**TODO** Remember to provide a screenshot of the deployed active endpoint in Sagemaker.
+I found a lot of issues while trying to query the deployed model endpoint. Ideally, preparing an entry point for the model inference alongside the model data should work:
+
+```py
+model_location = "s3://project03-image-classification-vexenta/model/vgg16-model-train-with-model-fn.tar.gz"
+pytorch_model = PyTorchModel(
+    model_data=model_location, 
+    role=role,
+    entry_point='src/inference.py',
+    py_version='py3',
+    framework_version='1.4',
+    predictor_cls=ImagePredictor
+)
+
+predictor = pytorch_model.deploy(
+    initial_instance_count=1, 
+    instance_type='ml.m5.large'
+)
+```
+
+These commands will deploy the model and create an endpoint.
+
+![07-endpoint-inservice](img/07-endpoint-inservice.png)
+
+The inference script already handles the data transformation to tensors, so we only need to pass image in bytes format as the payload for the endpoint.
+
+```py
+sample_image_path = "dogImages/test/002.Afghan_hound/Afghan_hound_00116.jpg"
+
+with open(sample_image_path, "rb") as f:
+    payload = f.read()
+
+response = predictor.predict(
+    payload,
+    initial_args={
+        "ContentType": "image/jpeg"
+    }
+)
+
+print(response)
+```
+
+The `response` stores an array of length 133, which represents the prediction for each class. To identify the predicted class, we can use `numpy.argmax()` function - it will return the index of the predicted class (which is aligned with the index of the dog breed folders).
+
+![08-endpoint-response-preview](img/08-endpoint-response-preview.png)
+
+As mentioned before, I found an issue: somehow my trained VGG16 model couldn't be loaded although it's already deployed as the endpoint ([despite using different ways to deploy](https://knowledge.udacity.com/questions/759044)). I've tried using the inference script locally - it successfully loads the model object and could run the prediction. 
+
+Regardless, to demonstrate the deployment and invoking the endpoint, I trained a smaller Resnet50 model (trained using 50 epochs) which has a worse accuracy. Using the previous code chunk, we could retrieve the predicted class from the endpoint. The following figure shows the success response (200 HTTP code) in Cloudwatch Logs.
+
+![09-endpoint-logs](img/09-endpoint-logs.png)
