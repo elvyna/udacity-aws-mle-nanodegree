@@ -43,7 +43,7 @@ def test(model, test_loader, criterion):
 def train(model, train_loader, validation_loader, criterion, optimizer):
     epochs = 5
     best_loss = 1e6
-    image_dataset = {'train':train_loader, 'valid':validation_loader}
+    image_dataset = {'train': train_loader, 'valid': validation_loader}
     loss_counter = 0
     #log = Report(epochs)
 
@@ -57,11 +57,11 @@ def train(model, train_loader, validation_loader, criterion, optimizer):
             running_corrects = 0
 
             for pos,(inputs, labels) in enumerate(image_dataset[phase]):
-                tot=len(image_dataset[phase])
+                tot = len(image_dataset[phase])
                 outputs = model(inputs)
                 loss = criterion(outputs, labels)
 
-                if phase=='train':
+                if phase == 'train':
                     optimizer.zero_grad()
                     loss.backward()
                     #log.record(pos=(pos+1)/tot, train_loss=loss, end='\r') # impersistent data
@@ -74,21 +74,21 @@ def train(model, train_loader, validation_loader, criterion, optimizer):
             epoch_loss = running_loss / len(image_dataset[phase])
             epoch_acc = running_corrects / len(image_dataset[phase])
             
-            if phase=='valid':
-                if epoch_loss<best_loss:
-                    best_loss=epoch_loss
+            if phase == 'valid':
+                if epoch_loss < best_loss:
+                    best_loss = epoch_loss
                 else:
-                    loss_counter+=1
+                    loss_counter += 1
                 with torch.no_grad():
                     for pos,(inputs, labels) in enumerate(image_dataset[phase]):
-                        tot=len(image_dataset[phase])
+                        tot = len(image_dataset[phase])
                         outputs = model(inputs)
                         valid_loss = criterion(outputs, labels)
                         #log.record(pos=(pos+1)/tot, valid_loss=valid_loss, end='\r') # impersistent data
 
-        if loss_counter==1:
+        if loss_counter == 1:
             break
-        if epoch==0:
+        if epoch == 0:
             break
     return model
     
