@@ -36,11 +36,11 @@ Analyzing users' purchasing intent has become one of the research areas in e-com
 
 [^6]: Kompan, M., Kassak, O., & Bielikova, M. (2019). The Short-term User Modeling for Predictive Applications. *Journal on Data Semantics, 8(1)*, 21–37. https://doi.org/10.1007/s13740-018-0095-1
 
-## Datasets
+## Datasets and Inputs
 
-In this project, we will use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/)[^k], which contains 429,013 rows of e-commerce sessions with 24 columns. The following table describes the dataset structure.
+In this project, we will use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/)[^7], which contains 429,013 rows of e-commerce sessions with 24 columns. The following table describes the dataset structure.
 
-[^k]: Data Mining Cup 2013. https://www.data-mining-cup.com/reviews/dmc-2013/
+[^7]: Data Mining Cup 2013. https://www.data-mining-cup.com/reviews/dmc-2013/
 
 | Column name      | Description |
 | ---------------- | ----------- |
@@ -73,30 +73,38 @@ This dataset is stored as a text file (`transact_train.txt`) with pipe (`|`) as 
 
 ## Proposed Solution
 
-A solution statement — the solution proposed for the problem given.
-
-> Student clearly describes a solution to the problem. The solution is applicable to the project domain and appropriate for the dataset(s) or input(s) given. Additionally, the solution is quantifiable, measurable, and replicable.
+To solve this problem, I plan to start with some exploratory analysis to ensure I fully understand the relationships within the data. Then, I will continue with data cleaning and preprocessing, especially to handle missing values and/or imbalanced class distribution. Based on the previous analysis results, I will extract the relevant features and proceed into the model training. As mentioned before, we aim to predict the `order` column - in other words, it will be a supervised machine learning problem. I will not restrict myself to any specific algorithms, but as a start, I will start with a simpler model, e.g., logistic regressions, before proceeding to more complex models.
 
 ## Benchmark Model
 
-The provided dataset contains 67% of confirmed orders. As a simple benchmark, we aim to train a model with higher prediction accuracy than this. *Any relevant research?*
-
-A benchmark model — some simple or historical model or result to compare the defined solution to.
-
-> A benchmark model is provided that relates to the domain, problem statement, and intended solution. Ideally, the student's benchmark model provides context for existing methods or known information in the domain and problem given, which can then be objectively compared to the student's solution. The benchmark model is clearly defined and measurable.
+The provided dataset contains 67% of confirmed orders. As a simple benchmark, we aim to train a model with higher prediction accuracy than this naive prediction. I could not find past research that use this dataset. However, as an additional benchmark, Sakar et al. achieved between 87% and 89% of prediction accuracy using multilayer perceptron, tree-based models, and support vector machine (SVM) [^5]. The best F1 score they achieved was 0.58 using either random forest or multilayer perceptron. 
 
 ## Evaluation Metrics
 
-A set of evaluation metrics — functional representations for how the solution can be measured.
+We will evaluate our model based on two metrics: prediction accuracy and F1 score. We use the F1 score to complement the accuracy since we begin with an imbalanced class distribution in the original dataset. The F1 score formula is displayed below.
 
-> Student proposes at least one evaluation metric that can be used to quantify the performance of both the benchmark model and the solution model presented. The evaluation metric(s) proposed are appropriate given the context of the data, the problem statement, and the intended solution.
+$$
+F_{1} = 2 \cdot \frac{\text{precision} \cdot \text{recall}}{\text{precision} + \text{recall}}
+$$
 
 ## Project Design
 
-An outline of the project design — how the solution will be developed and results obtained.
+This project is composed of several steps, which involves iterative process.
 
-> Student summarizes a theoretical workflow for approaching a solution given the problem. A discussion is made as to what strategies may be employed, what analysis of the data might be required, or which algorithms will be considered. The workflow and discussion provided align with the qualities of the project. Small visualizations, pseudocode, or diagrams are encouraged but not required.
+### 1. Business and data understanding
 
-Organisation:
+While working on this project proposal, we have developed a better understanding of the business. At this point, we only have a brief understanding of the dataset. Hence, we have to do more exploratory analysis to figure out: 1) how the data distribution looks, 2) required data cleaning and preprocessing steps, and 3) potential features to be extracted.
 
-> The proposal follows a well-organized structure and would be readily understood by its intended audience. Each section is written in a clear, concise and specific manner. Few grammatical and spelling mistakes are present. All resources used and referenced are properly cited.
+### 2. Data preparation
+
+Based on the findings from the exploratory data analysis, we will develop some standalone scripts to clean and properly preprocess the datasets.
+
+### 3. Feature engineering
+
+The preprocessed dataset from the previous step will be used as an input for the feature engineering step. Here, we will extract relevant information that we deem useful for the prediction model. 
+
+### 4. Model training, validation, and evaluation
+
+To properly evaluate the model, we will split the dataset into train, validation, and test set. The validation set can be used when we tune the hyperparameters of the model so that we can get an unbiased estimation of the model performance on the test set. As mentioned before, the model will be evaluated based on its accuracy and F1 score.
+
+As we work on the project, there will be multiple iterations in each of these steps. For example, it is extremely likely to revisit the feature engineering step when we could not achieve a better model performance after tuning the models.
