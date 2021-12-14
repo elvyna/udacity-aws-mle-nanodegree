@@ -18,7 +18,7 @@ Although every e-commerce platform may require different purchasing steps, they 
 
 [^2]: Alonso, V., Boar, C., Frost, J., Gambacorta, L., and Liu, J. (2021, January 12). *E-commerce in the pandemic and beyond*. Bank for International Settlements. https://www.bis.org/publ/bisbull36.pdf
 
-One of the earlier steps of the conversion funnel is adding items into the shopping cart. Although having the cart filled is one step closer to the purchase, there are possibilities that the users will abandon their cart. For example, the users might consider a shopping cart as a helper to save the items that they're interested in. This misuse might happen since not all e-commerce platforms have a wishlist or bookmark feature. 
+One of the earlier steps of the conversion funnel is adding items into the shopping cart. Although having the cart filled is one step closer to the purchase, there are possibilities that the users will abandon their cart. For example, the users might consider a shopping cart as a helper to save the items that they are interested in. This misuse might happen since not all e-commerce platforms have a wishlist or bookmark feature. 
 
 Some e-commerce platforms might consider protecting the inventory that has been added to a shopping cart to ensure a seamless user experience, i.e., the items will be reserved by the users although they leave the cart for hours before purchasing them. However, this method is likely to end up with huge potential losses, especially if most users frequently abandon their carts.
 
@@ -38,7 +38,7 @@ Analyzing users' purchasing intent has become one of the research areas in e-com
 
 ## Datasets and Inputs
 
-In this project, we will use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/)[^7], which contains 429,013 rows of e-commerce sessions with 24 columns. The following table describes the dataset structure.
+In this project, we will use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/) [^7], which contains 429,013 rows of e-commerce sessions with 24 columns. The following table describes the dataset structure.
 
 [^7]: Data Mining Cup 2013. https://www.data-mining-cup.com/reviews/dmc-2013/
 
@@ -55,7 +55,7 @@ In this project, we will use the dataset provided by [Data Mining Cup 2013](http
 | bCount       | number of products put in the shopping basket |
 | bMinPrice    | lowest price of all products put in the shopping basket |
 | bMaxPrice    | highest price of all products put in the shopping basket |
-| bSumPrice    | sum of theprices of all products put in the shopping basket|
+| bSumPrice    | sum of the prices of all products put in the shopping basket|
 | bStep    | purchase processing step (1,2,3,4,5)|
 | onlineStatus    | indication whether the customer is online|
 | availability    | delivery status|
@@ -89,7 +89,7 @@ $$
 
 ## Project Design
 
-This project is composed of several steps, which involves iterative process.
+This project is composed of several steps, which involves an iterative process.
 
 ### 1. Business and data understanding
 
@@ -105,6 +105,6 @@ The preprocessed dataset from the previous step will be used as an input for the
 
 ### 4. Model training, validation, and evaluation
 
-To properly evaluate the model, we will split the dataset into train, validation, and test set. The validation set can be used when we tune the hyperparameters of the model so that we can get an unbiased estimation of the model performance on the test set. As mentioned before, the model will be evaluated based on its accuracy and F1 score.
+To properly evaluate the model, we will split the dataset into the train, validation, and test set. The validation set can be used when we tune the hyperparameters of the model so that we can get an unbiased estimation of the model performance on the test set. As mentioned before, the model will be evaluated based on its accuracy and F1 score.
 
 As we work on the project, there will be multiple iterations in each of these steps. For example, it is extremely likely to revisit the feature engineering step when we could not achieve a better model performance after tuning the models.
