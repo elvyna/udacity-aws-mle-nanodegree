@@ -75,6 +75,11 @@ This dataset is stored as a text file (`transact_train.txt`) with pipe (`|`) as 
 
 To solve this problem, I plan to start with some exploratory analysis to ensure I fully understand the relationships within the data. Then, I will continue with data cleaning and preprocessing, especially to handle missing values and/or imbalanced class distribution. Based on the previous analysis results, I will extract the relevant features and proceed into the model training. As mentioned before, we aim to predict the `order` column - in other words, it will be a supervised machine learning problem. I will not restrict myself to any specific algorithms, but as a start, I will start with a simpler model, e.g., logistic regressions, before proceeding to more complex models.
 
+The success of this project is defined based on two major outputs:
+- Insights of the relationships found within the data, e.g., what are the key differentiators between checked-out and abandoned cart. These insights will be useful for product managers of e-commerce platforms to better inform their decisions.
+- Performance of the predictive model. As also discussed in the next two sections, we will measure the model performance based on its accuracy and F1 score. We aim to achieve at least 70% prediction accuracy, which is better than using a naive prediction solely based on the class distribution.
+
+
 ## Benchmark Model
 
 The provided dataset contains 67% of confirmed orders. As a simple benchmark, we aim to train a model with higher prediction accuracy than this naive prediction. I could not find past research that use this dataset. However, as an additional benchmark, Sakar et al. achieved between 87% and 89% of prediction accuracy using multilayer perceptron, tree-based models, and support vector machine (SVM) [^5]. The best F1 score they achieved was 0.58 using either random forest or multilayer perceptron. 
@@ -89,7 +94,10 @@ $$
 
 ## Project Design
 
-This project is composed of several steps, which involves an iterative process.
+This project is composed of several steps, which involves an iterative process. The following figure shows the Data Science Project Lifecycle, which is adapted to our project.
+
+![tdsp-lifecycle](../img/tdsp-lifecycle.png)
+<p align='center'>The Data Science Project Lifecycle. Source: <a href="https://docs.microsoft.com/en-us/azure/architecture/data-science-process/lifecycle">Microsoft</a></p>
 
 ### 1. Business and data understanding
 
