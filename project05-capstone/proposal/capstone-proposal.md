@@ -1,6 +1,11 @@
-# Project Title
+---
+Author: Elvyna Tunggawan
+Created at: December 14, 2021
+---
 
-## Background
+# Predicting E-Commerce Cart Abandonment
+
+## Domain Background
 
 The project's domain background — the field of research where the project is derived.
 
@@ -14,7 +19,36 @@ A problem statement — a problem being investigated for which a solution will b
 
 ## Datasets
 
-The datasets and inputs — data or inputs being used for the problem.
+We use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/), which contain 429,013 rows of e-commerce sessions with 24 columns. The following table describes the data dictionary.
+
+| Column name      | Description |
+| ---------------- | ----------- |
+| sessionNo        | running number of the session       |
+| startHour        | hour in which the session has begun        |
+| startWeekday        | day of week in which the session has begun (1: Mon, 2: Tue, ..., 7: Sun)        |
+| duration        | time in seconds passed since start of the session        |
+| cCount       | number of the products clicked on |
+| cMinPrice    | lowest price of a product clicked on |
+| cMaxPrice    | highest price of a product clicked on |
+| cSumPrice    | sum of the prices of all products clicked on |
+| bCount       | number of products put in the shopping basket |
+| bMinPrice    | lowest price of all products put in the shopping basket |
+| bMaxPrice    | highest price of all products put in the shopping basket |
+| bSumPrice    | sum of theprices of all products put in the shopping basket|
+| bStep    | purchase processing step (1,2,3,4,5)|
+| onlineStatus    | indication whether the customer is online|
+| availability    | delivery status|
+| customerID    | customer ID|
+| maxVal    | maximum admissible purchase price for the customer |
+| customerScore    | customer evaluation from the point of view of the shop |
+| accountLifetime    | lifetime of the customer's account in months |
+| payments    | number of payments affected by the customer |
+| age    | age of the customer |
+| address    | form of address of the customer (1: Mr, 2: Mrs, 3: company)|
+| lastOrder    | time in days passed since the last order|
+| order    | outcome of the session (y: purchase, n: non-purchase) |
+
+This dataset is stored as a text file (`transact_train.txt`) with pipe (`|`) as the delimiter values. We aim to have a model that can predict whether the order is purchased (`y`) or not (`n`).
 
 > The dataset(s) and/or input(s) to be used in the project are thoroughly described. Information such as how the dataset or input is (was) obtained, and the characteristics of the dataset or input, should be included. It should be clear how the dataset(s) or input(s) will be used in the project and whether their use is appropriate given the context of the problem.
 
@@ -44,7 +78,7 @@ An outline of the project design — how the solution will be developed and resu
 
 ## References
 
-- [1] ...
+- [1] https://www.data-mining-cup.com/reviews/dmc-2013/
 - [2] ...
 
 > The proposal follows a well-organized structure and would be readily understood by its intended audience. Each section is written in a clear, concise and specific manner. Few grammatical and spelling mistakes are present. All resources used and referenced are properly cited.
