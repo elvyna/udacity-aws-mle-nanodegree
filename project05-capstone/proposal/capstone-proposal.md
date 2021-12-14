@@ -21,6 +21,8 @@ A problem statement — a problem being investigated for which a solution will b
 
 We use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/)[^1], which contains 429,013 rows of e-commerce sessions with 24 columns. The following table describes the dataset structure.
 
+[^1]: Data Mining Cup 2013. https://www.data-mining-cup.com/reviews/dmc-2013/
+
 | Column name      | Description |
 | ---------------- | ----------- |
 | sessionNo        | running number of the session       |
@@ -76,11 +78,5 @@ An outline of the project design — how the solution will be developed and resu
 
 > Student summarizes a theoretical workflow for approaching a solution given the problem. A discussion is made as to what strategies may be employed, what analysis of the data might be required, or which algorithms will be considered. The workflow and discussion provided align with the qualities of the project. Small visualizations, pseudocode, or diagrams are encouraged but not required.
 
-## References
-
-[^1]: Data Mining Cup 2013. https://www.data-mining-cup.com/reviews/dmc-2013/
-
-- [1] https://www.data-mining-cup.com/reviews/dmc-2013/
-- [2] ...
 
 > The proposal follows a well-organized structure and would be readily understood by its intended audience. Each section is written in a clear, concise and specific manner. Few grammatical and spelling mistakes are present. All resources used and referenced are properly cited.
