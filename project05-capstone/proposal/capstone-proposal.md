@@ -18,22 +18,27 @@ Although every e-commerce platform may require different purchasing steps, they 
 
 [^2]: Alonso, V., Boar, C., Frost, J., Gambacorta, L., and Liu, J. (2021, January 12). *E-commerce in the pandemic and beyond*. Bank for International Settlements. https://www.bis.org/publ/bisbull36.pdf
 
+One of the earlier steps of the conversion funnel is adding items into the shopping cart. Although having the cart filled is one step closer to the purchase, there are possibilities that the users will abandon their cart. For example, the users might consider a shopping cart as a helper to save the items that they're interested in. This misuse might happen since not all e-commerce platforms have a wishlist or bookmark feature. 
 
-> Student briefly details background information of the domain from which the project is proposed. Historical information relevant to the project should be included. It should be clear how or why a problem in the domain can or should be solved. Related academic research should be appropriately cited. A discussion of the student's personal motivation for investigating a particular problem in the domain is encouraged but not required.
+Some e-commerce platforms might consider protecting the inventory that has been added to a shopping cart to ensure a seamless user experience, i.e., the items will be reserved by the users although they leave the cart for hours before purchasing them. However, this method is likely to end up with huge potential losses, especially if most users frequently abandon their carts.
 
 ## Problem Statement
 
-One of the latter parts of the conversion funnel is checking out the shopping cart (and purchasing the booking).
+Instead of protecting the inventory, e-commerce platforms usually introduce nudge marketing to influence user behaviour. However, nudges might backfire if they are implemented without understanding the user behaviour [^3].
 
-- Customers might abandon their cart or bookings
-- User experience vs. potential loss from abandoned cart/bookings
-- If we can predict whether the cart will be abandoned, the ecommerce platform may give different treatment to the users (e.g., offer coupon code to prevent abandonment, or offer upselling for users with low likelihood of abandoning their bookings)
+[^3]: Sanghi, R., Gupta, S., Mishra, R.C., Singh, A., Abrol, H., Madan, J., & Sagar, M. (2019). *Nudge Marketing in E-Commerce Businesses*. International Journal of Science and Research (IJSR). https://www.ijsr.net/archive/v8i8/ART2020223.pdf
 
-> Student clearly describes the problem that is to be solved. The problem is well defined and has at least one relevant potential solution. Additionally, the problem is quantifiable, measurable, and replicable.
+Analyzing users' purchasing intent has become one of the research areas in e-commerce. Most e-commerce platforms have pivoted to more personalized features and services, which is also the case for Pinterest [^4]. Website clickstream and user session data are the main data sources to understand the purchasing intent since they contain the whole picture of the e-commerce platform (not only the bookings) [^5] [^6]. If we could utilize the user activity logs to identify whether a cart is likely to be abandoned, the e-commerce platforms could provide more personalized treatment to the users. For example, they might offer coupon codes to convert the abandoning users into customers and offer some upselling for users with a high likelihood to purchase.
+
+[^4]: Lo, C., Frankowski, D., & Leskovec, J. (2016). Understanding behaviors that lead to purchasing. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining*. https://doi.org/10.1145/2939672.2939729
+
+[^5]: Sakar, C. O., Polat, S. O., Katircioglu, M., & Kastro, Y. (2018). Real-time prediction of online shoppers’ purchasing intention using multilayer perceptron and LSTM recurrent neural networks. *Neural Computing and Applications*, 31(10), 6893-6908. https://doi.org/10.1007/s00521-018-3523-0
+
+[^6]: Kompan, M., Kassak, O., & Bielikova, M. (2019). The Short-term User Modeling for Predictive Applications. *Journal on Data Semantics, 8(1)*, 21–37. https://doi.org/10.1007/s13740-018-0095-1
 
 ## Datasets
 
-We use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/)[^k], which contains 429,013 rows of e-commerce sessions with 24 columns. The following table describes the dataset structure.
+In this project, we will use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/)[^k], which contains 429,013 rows of e-commerce sessions with 24 columns. The following table describes the dataset structure.
 
 [^k]: Data Mining Cup 2013. https://www.data-mining-cup.com/reviews/dmc-2013/
 
@@ -66,8 +71,6 @@ We use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cu
 
 This dataset is stored as a text file (`transact_train.txt`) with pipe (`|`) as the delimiter values. We aim to create a model that predicts whether the order is purchased (`y`) or not (`n`).
 
-> The dataset(s) and/or input(s) to be used in the project are thoroughly described. Information such as how the dataset or input is (was) obtained, and the characteristics of the dataset or input, should be included. It should be clear how the dataset(s) or input(s) will be used in the project and whether their use is appropriate given the context of the problem.
-
 ## Proposed Solution
 
 A solution statement — the solution proposed for the problem given.
@@ -76,7 +79,7 @@ A solution statement — the solution proposed for the problem given.
 
 ## Benchmark Model
 
-The provided dataset contains 67% of confirmed orders. As a simple benchmark, we aim to train a model with higher prediction accuracy than this. *Any relevant reserarch?*
+The provided dataset contains 67% of confirmed orders. As a simple benchmark, we aim to train a model with higher prediction accuracy than this. *Any relevant research?*
 
 A benchmark model — some simple or historical model or result to compare the defined solution to.
 
