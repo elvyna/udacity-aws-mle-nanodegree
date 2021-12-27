@@ -3,3 +3,6 @@ numpy
 seaborn
 tqdm
 altair
+scikit-learn
+bayesian-optimization
+jupyter
