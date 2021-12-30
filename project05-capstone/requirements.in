@@ -6,3 +6,5 @@ altair
 scikit-learn
 bayesian-optimization
 jupyter
+catboost
+lightgbm
