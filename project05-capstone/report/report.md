@@ -80,7 +80,39 @@ In this section, you will need to clearly define the metrics or calculations you
 
 ### Data Exploration
 
-TO DO
+The original dataset does not contain any null values in any of its 24 columns. However, as illustrated in the table below, the missing values are encoded as `?`.
+
+| column name     | value | data type |
+|-----------------|-------|-----------|
+| sessionNo       | 1     | int64     |
+| startHour       | 6     | int64     |
+| startWeekday    | 5     | int64     |
+| duration        | 0.0   | float64   |
+| cCount          | 1     | int64     |
+| cMinPrice       | 59.99 | object    |
+| cMaxPrice       | 59.99 | object    |
+| cSumPrice       | 59.99 | object    |
+| bCount          | 1     | int64     |
+| bMinPrice       | 59.99 | object    |
+| bMaxPrice       | 59.99 | object    |
+| bSumPrice       | 59.99 | object    |
+| bStep           | ?     | object    |
+| onlineStatus    | ?     | object    |
+| availability    | ?     | object    |
+| customerNo      | 1     | object    |
+| maxVal          | 600   | object    |
+| customerScore   | 70    | object    |
+| accountLifetime | 21    | object    |
+| payments        | 1     | object    |
+| age             | 43    | object    |
+| address         | 1     | object    |
+| lastOrder       | 49    | object    |
+| order           | y     | object    |
+
+Most numeric columns, such as `cMinPrice` and `cMaxPrice` are stored as string objects since they contain `?` values. Hence, we need to replace those `?` values accordingly and convert the data types of those columns into numeric. Our target class is the `order` column, which has an imbalanced distribution. We might consider either resampling the data or generating synthetic samples to have a balanced class distribution.
+
+![original-class-distribution](../img/report/data-class-distribution-original.png)
+<p align='center'>Only 33% of the records are abandoned sessions with abandoned cart.</p>
 
 --
 
@@ -95,7 +127,12 @@ In this section, you will be expected to analyze the data you are using for the 
 
 ### Exploratory Visualization
 
-TO DO
+To get a high level understanding of the data, we compute the Pearson correlation of the numeric features. As mentioned before, we need to convert the data types after handling the `?` values. Here, we convert `?` values into `-99`. The original dataset does not contain any negative values, hence, we can use it to represent the missing values. Additionally, we convert `y` values into `1` and `n` into `0`.
+
+The figure below shows the correlation matrix. **TO DO: more explanation**
+
+![correlation-matrix](../img/report/data-correlation-matrix.png)
+<p align='center'>Negative correlation with price-related features, and positive correlation with customer score and age.</p>
 
 --
 
@@ -109,7 +146,7 @@ In this section, you will need to provide some form of visualization that summar
 
 ### Algorithms and Techniques
 
-TO DO
+As the initial iteration, we start with a logistic regression model without any hyperparameter tuning. This model provides a good interpretability and does not require too much computing resources. Based on this initial result, we continue with more complex algorithms, i.e., Random Forest, LightGBM, and CatBoost. We choose tree-based models rather than deep learning models to have more interpretable results and save the computing time.
 
 --
 
