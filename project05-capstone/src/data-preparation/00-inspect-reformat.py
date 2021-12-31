@@ -81,12 +81,8 @@ if __name__ == "__main__":
         df_source[col] = df_source[col].astype(int)
 
     ## remove ID columns
-    df_source.drop(
-        labels=["sessionNo", "customerNo"], 
-        axis=1,
-        inplace=True
-    )
-    
+    df_source.drop(labels=["sessionNo", "customerNo"], axis=1, inplace=True)
+
     ## save results
     output_path = config[storage_type]["reformat"]["path"]
     log.info(f"Saving dataset with dimension {df_source.shape} to {output_path}")

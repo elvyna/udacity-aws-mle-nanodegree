@@ -18,6 +18,7 @@ logging.basicConfig(
 
 log = logging.getLogger(__name__)
 
+
 def check_outliers(series: pd.Series):
     """
     Return outlier flag and the number of outliers in the series.
@@ -32,16 +33,17 @@ def check_outliers(series: pd.Series):
     iqr = q3 - q1
     lower_threshold = q1 - (1.5 * iqr)
     upper_threshold = q3 + (1.5 * iqr)
-    conditions = [
-        (series < lower_threshold) | (series > upper_threshold)
-    ]
+    conditions = [(series < lower_threshold) | (series > upper_threshold)]
     choice = [1]
-    outlier_flag_list = np.select(conditions, choice, default = 0)
+    outlier_flag_list = np.select(conditions, choice, default=0)
 
     return outlier_flag_list, sum(outlier_flag_list)
 
+
 if __name__ == "__main__":
-    log.info("Reference: notebook/00-data-understanding.ipynb")
+    log.info(
+        "Reference: \n 1) notebook/00-data-understanding.ipynb \n 2) notebook/02-model-training-iter1.ipynb"
+    )
 
     ## read data
     config = read_config("data-preparation.yml")
@@ -56,35 +58,30 @@ if __name__ == "__main__":
 
     ## identify outliers
     numeric_column_list = df_source._get_numeric_data().columns
-    excluded_column_list = [
-        'address'
-    ]
+    excluded_column_list = ["address"]
     selected_column_list = numeric_column_list.drop(labels=excluded_column_list)
 
     log.info("Number of outliers")
     log.info("------------------------")
     df_outliers = pd.DataFrame(
-        data = {
-            'colnames': [], 
-            'outliers_count': [],
-            'outliers_pct': []
-        }
+        data={"colnames": [], "outliers_count": [], "outliers_pct": []}
     )
 
     for col in selected_column_list:
         outlier_flag, outlier_count = check_outliers(df_source[col])
-        df_source[col+"_is_outlier"] = outlier_flag
-        
-        new_df = pd.DataFrame(data = {
-            'colnames': col, 
-            'outliers_count': outlier_count, 
-            'outliers_pct': outlier_count / df_source.shape[0] * 100
-        }, index = [0])
+        df_source[col + "_is_outlier"] = outlier_flag
+
+        new_df = pd.DataFrame(
+            data={
+                "colnames": col,
+                "outliers_count": outlier_count,
+                "outliers_pct": outlier_count / df_source.shape[0] * 100,
+            },
+            index=[0],
+        )
         df_outliers = pd.concat([df_outliers, new_df])
-        
-    log.info(
-        f"Identified outliers \n {df_outliers}"
-    )
+
+    log.info(f"Identified outliers \n {df_outliers}")
 
     ## remove outliers
     remove_outliers = config["strategy"]["remove_outliers"]
@@ -92,29 +89,30 @@ if __name__ == "__main__":
     log.info(f"Row count before outlier removal: {row_count_before:,}")
     if remove_outliers:
         ## remove rows that contain outlier
-        mask_is_outlier_column = df_source.columns.str.endswith('_is_outlier')
+        mask_is_outlier_column = df_source.columns.str.endswith("_is_outlier")
         is_outlier_column_list = df_source.columns[mask_is_outlier_column]
 
         for col in is_outlier_column_list:
-            mask_not_outlier = (df_source[col] == 0)
+            mask_not_outlier = df_source[col] == 0
             df_source = df_source[mask_not_outlier].copy().reset_index(drop=True)
-            
-        row_count_after = df_source.shape[0]
-        log.info(f"Row count after outlier removal: {row_count_after:,} ({row_count_after / row_count_before:,.3%} of the original rows)")
 
+        row_count_after = df_source.shape[0]
+        log.info(
+            f"Row count after outlier removal: {row_count_after:,} ({row_count_after / row_count_before:,.3%} of the original rows)"
+        )
 
     ## split training and test set
     ## train test split (using original data)
     test_proportion = config["strategy"]["test_proportion"]
     random_state = config["strategy"]["random_state"]
-    target_class = 'order'
+    target_class = "order"
     features = df_source.columns[(df_source.columns != target_class)]
 
     X_train, X_test, y_train, y_test = train_test_split(
-        df_source[features], 
+        df_source[features],
         df_source[target_class],
         test_size=test_proportion,
-        random_state=random_state
+        random_state=random_state,
     )
 
     X_train.reset_index(drop=True, inplace=True)
@@ -122,12 +120,12 @@ if __name__ == "__main__":
 
     X_test.reset_index(drop=True, inplace=True)
     y_test.reset_index(drop=True, inplace=True)
-    
-    df_train = pd.concat([X_train, y_train], axis=0)
-    df_test = pd.concat([X_test, y_test], axis=0)
+
+    df_train = pd.concat([X_train, y_train], axis=0).drop(labels=[0], axis=1)
+    df_test = pd.concat([X_test, y_test], axis=0).drop(labels=[0], axis=1)
 
     # save results
-    for dataset_type, df in zip(["train_set","test_set"], [df_train, df_test]):
+    for dataset_type, df in zip(["train_set", "test_set"], [df_train, df_test]):
         output_path = config[storage_type][dataset_type]["path"]
         log.info(f"Saving {dataset_type} with dimension {df.shape} to {output_path}")
         df.to_csv(output_path, index=False)
