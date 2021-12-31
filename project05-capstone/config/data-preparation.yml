@@ -6,3 +6,15 @@ local_storage:
     separator: '|'
   reformat:
     path: dataset/preprocessed/transact_train_reformat.csv
+    separator: ','
+  train_set:
+    path: dataset/preprocessed/df_train.csv
+    separator: ','
+  test_set:
+    path: dataset/preprocessed/df_test.csv
+    separator: ','
+
+strategy:
+  remove_outliers: True
+  test_proportion: 0.3
+  random_state: 121

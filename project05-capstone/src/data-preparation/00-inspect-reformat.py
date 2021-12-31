@@ -27,19 +27,19 @@ if __name__ == "__main__":
     input_path = config[storage_type]["raw"]["path"]
     input_separator = config[storage_type]["raw"]["separator"]
 
-    df_train = pd.read_csv(input_path, sep=input_separator)
-    log.info(f"Dataset preview \n{df_train.iloc[0]}")
+    df_source = pd.read_csv(input_path, sep=input_separator)
+    log.info(f"Dataset preview \n{df_source.iloc[0]}")
 
-    for col in df_train.columns:
+    for col in df_source.columns:
         log.info(
-            f"Preview of {col} - there are {df_train[col].nunique():,} unique values."
+            f"Preview of {col} - there are {df_source[col].nunique():,} unique values."
         )
-        log.info(sorted(df_train[col].unique()[-5:]))
+        log.info(sorted(df_source[col].unique()[-5:]))
         log.info("--------------------------------")
 
         ## replace missing value with a numeric value, e.g., -99
-        mask = df_train[col] == "?"
-        df_train.loc[mask, col] = -99
+        mask = df_source[col] == "?"
+        df_source.loc[mask, col] = -99
 
     ## reformat data types
     # then, convert to numeric
@@ -67,21 +67,27 @@ if __name__ == "__main__":
     ]
 
     for col in numeric_column_list:
-        df_train[col] = df_train[col].astype(float)
+        df_source[col] = df_source[col].astype(float)
 
     for col in ["onlineStatus", "order"]:
         condition_list = [
-            (df_train[col] == "y"),
-            (df_train[col] == "n"),
+            (df_source[col] == "y"),
+            (df_source[col] == "n"),
         ]
         choice_list = [1, 0]
-        df_train[col] = np.select(condition_list, choice_list, default=df_train[col])
+        df_source[col] = np.select(condition_list, choice_list, default=df_source[col])
 
     for col in ["order", "address"]:
-        df_train[col] = df_train[col].astype(int)
+        df_source[col] = df_source[col].astype(int)
 
+    ## remove ID columns
+    df_source.drop(
+        labels=["sessionNo", "customerNo"], 
+        axis=1,
+        inplace=True
+    )
+    
     ## save results
     output_path = config[storage_type]["reformat"]["path"]
-    output_path = os.path.join("dataset", "preprocessed", "transact_train_reformat.csv")
-    log.info(f"Saving dataset with dimension {df_train.shape} to {output_path}")
-    df_train.to_csv(output_path, index=False)
+    log.info(f"Saving dataset with dimension {df_source.shape} to {output_path}")
+    df_source.to_csv(output_path, index=False)
