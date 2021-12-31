@@ -2,6 +2,12 @@ import pandas as pd
 import numpy as np
 import os
 import logging
+import sys
+
+work_dir = os.getcwd()
+sys.path.append(work_dir)
+
+from src.utils.config import read_config
 
 logging.basicConfig(
     format="%(filename)s %(asctime)s %(levelname)s Line no: %(lineno)d %(message)s",
@@ -14,10 +20,14 @@ log = logging.getLogger(__name__)
 if __name__ == "__main__":
     log.info("Reference: notebook/00-data-understanding.ipynb")
 
-    ## read raw data
-    input_train_path = os.path.join("dataset", "transact_train.txt")
+    config = read_config("data-preparation.yml")
 
-    df_train = pd.read_csv(input_train_path, sep="|")
+    ## read raw data
+    storage_type = "local_storage"
+    input_path = config[storage_type]["raw"]["path"]
+    input_separator = config[storage_type]["raw"]["separator"]
+
+    df_train = pd.read_csv(input_path, sep=input_separator)
     log.info(f"Dataset preview \n{df_train.iloc[0]}")
 
     for col in df_train.columns:
@@ -71,6 +81,7 @@ if __name__ == "__main__":
         df_train[col] = df_train[col].astype(int)
 
     ## save results
+    output_path = config[storage_type]["reformat"]["path"]
     output_path = os.path.join("dataset", "preprocessed", "transact_train_reformat.csv")
     log.info(f"Saving dataset with dimension {df_train.shape} to {output_path}")
     df_train.to_csv(output_path, index=False)

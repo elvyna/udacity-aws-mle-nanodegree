@@ -9,3 +9,4 @@ jupyter
 catboost
 lightgbm
 black
+ruamel.yaml

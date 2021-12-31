@@ -1,0 +1,8 @@
+## TO DO - placeholder for src/data-preparation/*.py
+## set local path and s3 bucket (later)
+local_storage:
+  raw: 
+    path: dataset/transact_train.txt
+    separator: '|'
+  reformat:
+    path: dataset/preprocessed/transact_train_reformat.csv
