@@ -114,6 +114,8 @@ Most numeric columns, such as `cMinPrice` and `cMaxPrice` are stored as string o
 ![original-class-distribution](../img/report/data-class-distribution-original.png)
 <p align='center'>Only 33% of the records are abandoned sessions with abandoned cart.</p>
 
+Although the data dictionary mentioned that `startWeekday` encoding starts with 1 (for Monday) and ends with 7 (for Sunday), the dataset only contains 5, 6, and 7 values in this column. 
+
 --
 
 In this section, you will be expected to analyze the data you are using for the problem. This data can either be in the form of a dataset (or datasets), input data (or input files), or even an environment. The **type of data** should be thoroughly described and, if possible, have **basic statistics and information presented** (such as discussion of input features or defining characteristics about the input or environment). Any abnormalities or interesting qualities about the data that may need to be addressed have been identified (such as **features that need to be transformed** or the **possibility of outliers**). Questions to ask yourself when writing this section:
