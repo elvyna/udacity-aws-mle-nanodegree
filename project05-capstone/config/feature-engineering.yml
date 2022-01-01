@@ -1,0 +1,18 @@
+## TO DO - placeholder for src/data-preparation/*.py
+## set local path and s3 bucket (later)
+local_storage:
+  input:
+    train_set:
+      path: dataset/preprocessed/df_train.csv
+      separator: ','
+    test_set:
+      path: dataset/preprocessed/df_test.csv
+      separator: ','
+  feature_set:
+    train_set:
+      path: dataset/feature-engineering/df_train.csv
+      separator: ','
+    test_set:
+      path: dataset/feature-engineering/df_test.csv
+      separator: ','
+
