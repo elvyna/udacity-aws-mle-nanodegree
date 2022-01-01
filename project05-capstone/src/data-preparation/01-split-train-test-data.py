@@ -47,8 +47,6 @@ if __name__ == "__main__":
 
     ## read data
     config = read_config("data-preparation.yml")
-
-    ## read raw data
     storage_type = "local_storage"
     input_path = config[storage_type]["reformat"]["path"]
     input_separator = config[storage_type]["reformat"]["separator"]

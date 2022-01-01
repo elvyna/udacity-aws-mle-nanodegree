@@ -15,4 +15,20 @@ local_storage:
     test_set:
       path: dataset/feature-engineering/df_test.csv
       separator: ','
+  feature_selection:
+    train_set:
+      path: dataset/feature-engineering/df_train_rfe.csv
+      separator: ','
+    test_set:
+      path: dataset/feature-engineering/df_test_rfe.csv
+      separator: ','
+
+strategy:
+  oversampling:
+    neighbour_count: 65
+  random_state: 121
+  feature_selection:
+    proportion: 0.7
+
+
 
