@@ -10,3 +10,4 @@ catboost
 lightgbm
 black
 ruamel.yaml
+imblearn

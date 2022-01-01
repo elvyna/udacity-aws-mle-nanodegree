@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     ## identify outliers
     numeric_column_list = df_source._get_numeric_data().columns
-    excluded_column_list = ["address"]
+    excluded_column_list = ["address", "order"]
     selected_column_list = numeric_column_list.drop(labels=excluded_column_list)
 
     log.info("Number of outliers")
@@ -121,8 +121,8 @@ if __name__ == "__main__":
     X_test.reset_index(drop=True, inplace=True)
     y_test.reset_index(drop=True, inplace=True)
 
-    df_train = pd.concat([X_train, y_train], axis=0).drop(labels=[0], axis=1)
-    df_test = pd.concat([X_test, y_test], axis=0).drop(labels=[0], axis=1)
+    df_train = pd.concat([X_train, y_train], axis=1)
+    df_test = pd.concat([X_test, y_test], axis=1)
 
     # save results
     for dataset_type, df in zip(["train_set", "test_set"], [df_train, df_test]):
