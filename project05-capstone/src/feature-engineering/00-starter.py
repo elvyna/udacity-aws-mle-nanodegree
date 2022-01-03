@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 
 ## use one hot encoder for categorical values
 from sklearn.preprocessing import OneHotEncoder
