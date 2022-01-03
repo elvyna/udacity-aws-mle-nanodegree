@@ -100,9 +100,38 @@ def kfold_cv(clf, X_train, y_train, k: int = 10, random_state: int = 121):
 
 
 if __name__ == "__main__":
-    log.info(
-        "TO DO - add CLI args to get the hyperparameters if we want to do hp tuning (otherwise, read model config)"
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--n_estimators",
+        type=int,
+        default=100,
+        metavar="N",
+        help="number of trees in the random forest model (default: 100)",
     )
+    parser.add_argument(
+        "--max_depth",
+        type=int,
+        default=20,
+        metavar="N",
+        help="max tree depth (default: 20)",
+    )
+    parser.add_argument(
+        "--min_samples_split",
+        type=int,
+        default=10,
+        help="minimum samples required to split an internal node (default: 10)",
+    )
+    # parser.add_argument(
+    #     "--model-output-dir",
+    #     type=str,
+    #     default=os.environ["SM_MODEL_DIR"],
+    #     help="Define where the best model object from hp tuning is stored",
+    # )
+    # parser.add_argument(
+    #     "--training-input", type=str, default=os.environ["SM_CHANNEL_TRAIN"]
+    # )
+    # parser.add_argument("--test-input", type=str, default=os.environ["SM_CHANNEL_TEST"])
+    args = parser.parse_args()
 
     ## read data
     config = read_config("feature-engineering.yml")
@@ -131,7 +160,12 @@ if __name__ == "__main__":
 
     random_state = 121
     ## test model training
-    model_clf = RandomForestClassifier(random_state=random_state)
+    model_clf = RandomForestClassifier(
+        random_state=random_state,
+        n_estimators=args.n_estimators,
+        max_depth=args.max_depth,
+        min_samples_split=args.min_samples_split,
+    )
 
     ## Perform k-fold cross-validation
     kfold_iteration = 5
@@ -161,4 +195,8 @@ if __name__ == "__main__":
     df_model_coef["coef_abs"] = np.abs(df_model_coef["coef"])
 
     log.info(model_clf.get_params())
-    breakpoint()
+    # breakpoint()
+    ## TO DO
+    ## 1) accept hyperparameters as cli args - DONE
+    ## 2) prepare notebook in sagemaker, test running the script as a simple model training job
+    ## 3) run script as hp tuning job -- specify the hyperparameter search range!
