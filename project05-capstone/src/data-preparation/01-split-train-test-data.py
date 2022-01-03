@@ -99,6 +99,11 @@ if __name__ == "__main__":
             f"Row count after outlier removal: {row_count_after:,} ({row_count_after / row_count_before:,.3%} of the original rows)"
         )
 
+        ## remove is_outlier columns
+        mask_is_outlier_column = df_source.columns.str.endswith("_is_outlier")
+        is_outlier_column_list = df_source.columns[mask_is_outlier_column]
+        df_source.drop(labels=is_outlier_column_list, axis=1, inplace=True)
+
     ## split training and test set
     ## train test split (using original data)
     test_proportion = config["strategy"]["test_proportion"]

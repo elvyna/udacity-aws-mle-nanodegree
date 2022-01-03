@@ -125,10 +125,10 @@ if __name__ == "__main__":
         df_test.drop(labels=selected_feature, axis=1, inplace=True)
 
     ## remove is_outlier columns
-    mask_is_outlier_column = df_train.columns.str.endswith("_is_outlier")
-    is_outlier_column_list = df_train.columns[mask_is_outlier_column]
-    df_train.drop(labels=is_outlier_column_list, axis=1, inplace=True)
-    df_test.drop(labels=is_outlier_column_list, axis=1, inplace=True)
+    # mask_is_outlier_column = df_train.columns.str.endswith("_is_outlier")
+    # is_outlier_column_list = df_train.columns[mask_is_outlier_column]
+    # df_train.drop(labels=is_outlier_column_list, axis=1, inplace=True)
+    # df_test.drop(labels=is_outlier_column_list, axis=1, inplace=True)
 
     ## reformat
     categorical_feature_list = [
