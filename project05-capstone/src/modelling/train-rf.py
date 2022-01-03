@@ -121,32 +121,28 @@ if __name__ == "__main__":
         default=10,
         help="minimum samples required to split an internal node (default: 10)",
     )
-    # parser.add_argument(
-    #     "--model-output-dir",
-    #     type=str,
-    #     default=os.environ["SM_MODEL_DIR"],
-    #     help="Define where the best model object from hp tuning is stored",
-    # )
-    # parser.add_argument(
-    #     "--training-input", type=str, default=os.environ["SM_CHANNEL_TRAIN"]
-    # )
-    # parser.add_argument("--test-input", type=str, default=os.environ["SM_CHANNEL_TEST"])
+    parser.add_argument(
+        "--model-output-dir",
+        type=str,
+        default=os.environ["SM_MODEL_DIR"],
+        help="Define where the best model object from hp tuning is stored",
+    )
+    parser.add_argument(
+        "--training-input", type=str, default=os.environ["SM_CHANNEL_TRAIN"]
+    )
+    parser.add_argument("--test-input", type=str, default=os.environ["SM_CHANNEL_TEST"])
     args = parser.parse_args()
 
     ## read data
-    config = read_config("feature-engineering.yml")
+    config = read_config("model-training.yml")
     storage_type = "local_storage"
 
     df_train = pd.DataFrame()
     df_test = pd.DataFrame()
     for dataset_type in ["train_set", "test_set"]:
-        input_path = config[storage_type]["feature_set"][dataset_type]["path"]
-        input_separator = config[storage_type]["feature_set"][dataset_type]["separator"]
+        input_path = args.training_input # config[storage_type]["input"][dataset_type]["path"]
+        input_separator = config[storage_type]["input"][dataset_type]["separator"]
         if "train" in dataset_type:
-            neighbour_count = config["strategy"]["oversampling"]["neighbour_count"]
-            input_path = input_path.replace(
-                "df_train.csv", f"df_train-smote-{neighbour_count}.csv"
-            )
             df_train = pd.read_csv(input_path, sep=input_separator)
         elif "test" in dataset_type:
             df_test = pd.read_csv(input_path, sep=input_separator)
