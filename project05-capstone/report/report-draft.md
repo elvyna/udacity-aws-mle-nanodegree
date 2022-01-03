@@ -19,7 +19,7 @@ Although every e-commerce platform may require different purchasing steps, they 
 
 One of the earlier steps of the conversion funnel is adding items into the shopping cart. Although having the cart filled is one step closer to the purchase, there are possibilities that the users will abandon their cart. For example, the users might consider a shopping cart as a helper to save the items that they are interested in. This misuse might happen since not all e-commerce platforms have a wishlist or bookmark feature. 
 
-In this project, we use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/) [^3], which contains 429,013 rows of e-commerce sessions with 24 columns that describe the user activity for each session.
+In this project, we use the dataset provided by [Data Mining Cup 2013](https://www.data-mining-cup.com/reviews/dmc-2013/) [^3], which contains 429,013 rows of e-commerce sessions with 24 columns. Each row represents the activity of each session at a particular hour of the day.
 
 [^3]: Data Mining Cup 2013. https://www.data-mining-cup.com/reviews/dmc-2013/
 
@@ -46,7 +46,7 @@ Analyzing users' purchasing intent has become one of the research areas in e-com
 
 [^7]: Kompan, M., Kassak, O., & Bielikova, M. (2019). The Short-term User Modeling for Predictive Applications. *Journal on Data Semantics, 8(1)*, 21–37. https://doi.org/10.1007/s13740-018-0095-1
 
-Predicting the shopping cart abandonment can be approached as a binary classification problem. We aim to train a model that accurately predicts the cart abandonment rate of each web session based on the provided information in the dataset. Before going straight into modelling, one of the challenges is to understand the key difference between abandoning and converting users. Hence, some exploratory analyses are required, which will lead to further hypotheses for the feature engineering and modelling steps.
+Predicting shopping cart abandonment can be approached as a binary classification problem. We aim to train a model that accurately predicts the cart abandonment rate of each web session based on the provided information in the dataset. Before going straight into modelling, one of the challenges is to understand the key difference between abandoning and converting users. Hence, some exploratory analyses are required, which will lead to further hypotheses for the feature engineering and modelling steps.
 
 
 --
@@ -112,7 +112,7 @@ The original dataset does not contain any null values in any of its 24 columns. 
 Most numeric columns, such as `cMinPrice` and `cMaxPrice` are stored as string objects since they contain `?` values. Hence, we need to replace those `?` values accordingly and convert the data types of those columns into numeric. Our target class is the `order` column, which has an imbalanced distribution. We might consider either resampling the data or generating synthetic samples to have a balanced class distribution.
 
 ![original-class-distribution](../img/report/data-class-distribution-original.png)
-<p align='center'>Only 33% of the records are abandoned sessions with abandoned cart.</p>
+<p align='center'>Only 33% of the records are abandoned sessions with abandoned carts.</p>
 
 Although the data dictionary mentioned that `startWeekday` encoding starts with 1 (for Monday) and ends with 7 (for Sunday), the dataset only contains 5, 6, and 7 values in this column. 
 
@@ -129,7 +129,7 @@ In this section, you will be expected to analyze the data you are using for the 
 
 ### Exploratory Visualization
 
-To get a high level understanding of the data, we compute the Pearson correlation of the numeric features. As mentioned before, we need to convert the data types after handling the `?` values. Here, we convert `?` values into `-99`. The original dataset does not contain any negative values, hence, we can use it to represent the missing values. Additionally, we convert `y` values into `1` and `n` into `0`.
+To get a high-level understanding of the data, we compute the Pearson correlation of the numeric features. As mentioned before, we need to convert the data types after handling the `?` values. Here, we convert `?` values into `-99`. The original dataset does not contain any negative values, hence, we can use it to represent the missing values. Additionally, we convert `y` values into `1` and `n` into `0`.
 
 The figure below shows the correlation matrix. **TO DO: more explanation**
 
@@ -148,7 +148,7 @@ In this section, you will need to provide some form of visualization that summar
 
 ### Algorithms and Techniques
 
-As the initial iteration, we start with a logistic regression model without any hyperparameter tuning. This model provides a good interpretability and does not require too much computing resources. Based on this initial result, we continue with more complex algorithms, i.e., Random Forest, LightGBM, and CatBoost. We choose tree-based models rather than deep learning models to have more interpretable results and save the computing time.
+As the initial iteration, we start with a logistic regression model with basic hyperparameters without any tuning. This model provides good interpretability and does not require too many computing resources. Based on this initial result, we continue with more complex algorithms, i.e., Random Forest, LightGBM, and CatBoost. We choose tree-based models rather than deep learning models to have more interpretable results and save computing time.
 
 --
 
