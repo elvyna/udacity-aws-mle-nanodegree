@@ -196,10 +196,9 @@ if __name__ == "__main__":
     df_model_coef["coef_abs"] = np.abs(df_model_coef["coef"])
 
     log.info(model_clf.get_params())
-    
+    ## save feature names
+    model_clf.feature_names = X_train.columns.values.tolist()
+
     model_output_dir = args.model_output_dir
     model_output_file_path = os.path.join(model_output_dir, "model.pkl")
-    pickle.dump(
-        model_clf, 
-        open(model_output_file_path, 'wb')
-    )
+    pickle.dump(model_clf, open(model_output_file_path, "wb"))

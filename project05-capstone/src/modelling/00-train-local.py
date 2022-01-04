@@ -64,7 +64,9 @@ def evaluate_performance(
     return accuracy, f_score, auc
 
 
-def kfold_cv(clf, X_train: pd.DataFrame, y_train: pd.Series, k: int = 10, random_state: int = 121):
+def kfold_cv(
+    clf, X_train: pd.DataFrame, y_train: pd.Series, k: int = 10, random_state: int = 121
+):
     """
     Run k-fold cross-validation by splitting the training set into train and validation set.
 
@@ -207,9 +209,9 @@ if __name__ == "__main__":
 
     log.info(model_clf.get_params())
 
+    ## save feature names
+    model_clf.feature_names = X_train.columns.values.tolist()
+
     model_output_dir = "model"
     model_output_file_path = os.path.join(model_output_dir, "model.pkl")
-    pickle.dump(
-        model_clf, 
-        open(model_output_file_path, 'wb')
-    )
+    pickle.dump(model_clf, open(model_output_file_path, "wb"))
