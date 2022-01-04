@@ -6,6 +6,7 @@ from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
 
 import argparse
+import pickle
 import os
 import logging
 
@@ -58,6 +59,20 @@ def evaluate_performance(
 
 
 def kfold_cv(clf, X_train, y_train, k: int = 10, random_state: int = 121):
+    """
+    Run k-fold cross-validation by splitting the training set into train and validation set.
+
+    :param clf: model object / estimator
+    :type clf: [type]
+    :param X_train: features of training set
+    :type X_train: pd.DataFrame
+    :param y_train: actual target class of the training set
+    :type y_train: pd.Series
+    :param k: number of folds for CV, defaults to 10
+    :type k: int, optional
+    :param random_state: random seed to allow reproducible results, defaults to 121
+    :type random_state: int, optional
+    """
     kfold = KFold(random_state=random_state, shuffle=True, n_splits=k)
 
     cv_accuracy = np.zeros(shape=k)
@@ -181,3 +196,10 @@ if __name__ == "__main__":
     df_model_coef["coef_abs"] = np.abs(df_model_coef["coef"])
 
     log.info(model_clf.get_params())
+    
+    model_output_dir = args.model_output_dir
+    model_output_file_path = os.path.join(model_output_dir, "model.pkl")
+    pickle.dump(
+        model_clf, 
+        open(model_output_file_path, 'wb')
+    )
