@@ -6,14 +6,9 @@ from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
 
 import argparse
+import pickle
 import os
 import logging
-import sys
-
-work_dir = os.getcwd()
-sys.path.append(work_dir)
-
-from src.utils.config import read_config
 
 logging.basicConfig(
     format="%(filename)s %(asctime)s %(levelname)s Line no: %(lineno)d %(message)s",
@@ -64,6 +59,20 @@ def evaluate_performance(
 
 
 def kfold_cv(clf, X_train, y_train, k: int = 10, random_state: int = 121):
+    """
+    Run k-fold cross-validation by splitting the training set into train and validation set.
+
+    :param clf: model object / estimator
+    :type clf: [type]
+    :param X_train: features of training set
+    :type X_train: pd.DataFrame
+    :param y_train: actual target class of the training set
+    :type y_train: pd.Series
+    :param k: number of folds for CV, defaults to 10
+    :type k: int, optional
+    :param random_state: random seed to allow reproducible results, defaults to 121
+    :type random_state: int, optional
+    """
     kfold = KFold(random_state=random_state, shuffle=True, n_splits=k)
 
     cv_accuracy = np.zeros(shape=k)
@@ -133,19 +142,15 @@ if __name__ == "__main__":
     parser.add_argument("--test-input", type=str, default=os.environ["SM_CHANNEL_TEST"])
     args = parser.parse_args()
 
-    ## read data
-    config = read_config("model-training.yml")
-    storage_type = "local_storage"
-
     df_train = pd.DataFrame()
     df_test = pd.DataFrame()
     for dataset_type in ["train_set", "test_set"]:
-        input_path = args.training_input # config[storage_type]["input"][dataset_type]["path"]
-        input_separator = config[storage_type]["input"][dataset_type]["separator"]
         if "train" in dataset_type:
-            df_train = pd.read_csv(input_path, sep=input_separator)
+            input_path = os.path.join(args.training_input, "df_train_rfe.csv")
+            df_train = pd.read_csv(input_path, engine="python")
         elif "test" in dataset_type:
-            df_test = pd.read_csv(input_path, sep=input_separator)
+            input_path = os.path.join(args.test_input, "df_test_rfe.csv")
+            df_test = pd.read_csv(input_path, engine="python")
 
     target_class = "order"
     y_train = df_train[target_class].copy()
@@ -155,7 +160,7 @@ if __name__ == "__main__":
     X_test = df_test.drop(labels=[target_class], axis=1)
 
     random_state = 121
-    ## test model training
+    ## init model
     model_clf = RandomForestClassifier(
         random_state=random_state,
         n_estimators=args.n_estimators,
@@ -191,8 +196,10 @@ if __name__ == "__main__":
     df_model_coef["coef_abs"] = np.abs(df_model_coef["coef"])
 
     log.info(model_clf.get_params())
-    # breakpoint()
-    ## TO DO
-    ## 1) accept hyperparameters as cli args - DONE
-    ## 2) prepare notebook in sagemaker, test running the script as a simple model training job
-    ## 3) run script as hp tuning job -- specify the hyperparameter search range!
+    
+    model_output_dir = args.model_output_dir
+    model_output_file_path = os.path.join(model_output_dir, "model.pkl")
+    pickle.dump(
+        model_clf, 
+        open(model_output_file_path, 'wb')
+    )
