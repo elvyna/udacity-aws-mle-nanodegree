@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler(sys.stdout))
 
 JSON_CONTENT_TYPE = "application/json"
+CSV_CONTENT_TYPE = "text/csv"
 
 
 def determine_time_of_day(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
@@ -44,9 +45,7 @@ def determine_time_of_day(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
     return df
 
 
-def preprocess_input(request_body):
-    ## convert input json object as a dataframe of one row
-    df_test = pd.json_normalize(request_body)
+def preprocess_input(df_test):
     ## convert '?' into -99
     ## reformat data types
     for col in df_test.columns:
@@ -155,18 +154,24 @@ def model_fn(model_dir):
 
 def input_fn(request_body, content_type=JSON_CONTENT_TYPE):
     assert (
-        content_type == JSON_CONTENT_TYPE
+        content_type in [JSON_CONTENT_TYPE, CSV_CONTENT_TYPE]
     ), f"Request has an unsupported ContentType in content_type: {content_type}"
-    log.info("Deserializing the input data.")
 
     log.debug(f"Request body CONTENT-TYPE is: {content_type}")
     log.debug(f"Request body TYPE is: {type(request_body)}")
-
+    
+    log.info("Deserializing the input data.")
     log.debug(f"Request body is: {request_body}")
-    request = json.loads(request_body)
-    log.debug(f"Loaded JSON object: {request}")
+    
+    if content_type == JSON_CONTENT_TYPE:
+        ## convert input json object as a dataframe of one row
+        request = json.loads(request_body)
+        log.debug(f"Loaded JSON object: {request}")
+        df_test = pd.json_normalize(request)
+    else:
+        df_test = pd.read_csv(request_body)
 
-    df_test = preprocess_input(request_body=request)
+    df_test = preprocess_input(request_body=df_test)
     return df_test
 
 
@@ -178,33 +183,3 @@ def predict_fn(input_object, model):
     prediction = model(input_object)
 
     return prediction
-
-
-# if __name__ == "__main__":
-#     request_body = {
-#         "sessionNo": 101,
-#         "startHour": 4,
-#         "startWeekday": 7,
-#         "duration": 0,
-#         "cCount": 2,
-#         "cMinPrice": 30,
-#         "cMaxPrice": 40,
-#         "cSumPrice": 70,
-#         "bCount": 1,
-#         "bMinPrice": 30,
-#         "bMaxPrice": 30,
-#         "bSumPrice": 30,
-#         "bStep": "?",
-#         "onlineStatus": "?",
-#         "availability": "?",
-#         "customerNo": 39,
-#         "maxVal": 200,
-#         "customerScore": 65,
-#         "accountLifetime": 30,
-#         "payments": 2,
-#         "age": 39,
-#         "address": 1,
-#         "lastOrder": 30,
-#     }
-
-#     breakpoint()
