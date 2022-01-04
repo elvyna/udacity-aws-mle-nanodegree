@@ -81,29 +81,6 @@ if __name__ == "__main__":
 
     log.info(f"Identified outliers \n {df_outliers}")
 
-    ## remove outliers
-    remove_outliers = config["strategy"]["remove_outliers"]
-    row_count_before = df_source.shape[0]
-    log.info(f"Row count before outlier removal: {row_count_before:,}")
-    if remove_outliers:
-        ## remove rows that contain outlier
-        mask_is_outlier_column = df_source.columns.str.endswith("_is_outlier")
-        is_outlier_column_list = df_source.columns[mask_is_outlier_column]
-
-        for col in is_outlier_column_list:
-            mask_not_outlier = df_source[col] == 0
-            df_source = df_source[mask_not_outlier].copy().reset_index(drop=True)
-
-        row_count_after = df_source.shape[0]
-        log.info(
-            f"Row count after outlier removal: {row_count_after:,} ({row_count_after / row_count_before:,.3%} of the original rows)"
-        )
-
-        ## remove is_outlier columns
-        mask_is_outlier_column = df_source.columns.str.endswith("_is_outlier")
-        is_outlier_column_list = df_source.columns[mask_is_outlier_column]
-        df_source.drop(labels=is_outlier_column_list, axis=1, inplace=True)
-
     ## split training and test set
     ## train test split (using original data)
     test_proportion = config["strategy"]["test_proportion"]
@@ -126,6 +103,33 @@ if __name__ == "__main__":
 
     df_train = pd.concat([X_train, y_train], axis=1)
     df_test = pd.concat([X_test, y_test], axis=1)
+
+    ## remove outliers ONLY on training set
+    remove_outliers = config["strategy"]["remove_outliers"]
+    row_count_before = df_train.shape[0]
+    log.info(f"Row count before outlier removal: {row_count_before:,}")
+    if remove_outliers:
+        ## remove rows that contain outlier
+        mask_is_outlier_column = df_train.columns.str.endswith("_is_outlier")
+        is_outlier_column_list = df_train.columns[mask_is_outlier_column]
+
+        for col in is_outlier_column_list:
+            mask_not_outlier = df_train[col] == 0
+            df_train = df_train[mask_not_outlier].copy().reset_index(drop=True)
+
+        row_count_after = df_train.shape[0]
+        log.info(
+            f"Row count after outlier removal: {row_count_after:,} ({row_count_after / row_count_before:,.3%} of the original rows)"
+        )
+
+        ## remove is_outlier columns
+        mask_is_outlier_column = df_train.columns.str.endswith("_is_outlier")
+        is_outlier_column_list = df_train.columns[mask_is_outlier_column]
+        df_train.drop(labels=is_outlier_column_list, axis=1, inplace=True)
+
+        mask_is_outlier_column = df_test.columns.str.endswith("_is_outlier")
+        is_outlier_column_list = df_test.columns[mask_is_outlier_column]
+        df_test.drop(labels=is_outlier_column_list, axis=1, inplace=True)
 
     # save results
     for dataset_type, df in zip(["train_set", "test_set"], [df_train, df_test]):
