@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 import argparse
 import os
 import logging
+import pickle
 import sys
 
 work_dir = os.getcwd()
@@ -205,8 +206,10 @@ if __name__ == "__main__":
     df_model_coef["coef_abs"] = np.abs(df_model_coef["coef"])
 
     log.info(model_clf.get_params())
-    # breakpoint()
-    ## TO DO
-    ## 1) accept hyperparameters as cli args - DONE
-    ## 2) prepare notebook in sagemaker, test running the script as a simple model training job
-    ## 3) run script as hp tuning job -- specify the hyperparameter search range!
+
+    model_output_dir = "model"
+    model_output_file_path = os.path.join(model_output_dir, "model.pkl")
+    pickle.dump(
+        model_clf, 
+        open(model_output_file_path, 'wb')
+    )
