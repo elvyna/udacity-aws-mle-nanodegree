@@ -70,7 +70,7 @@ if __name__ == "__main__":
     log.info(df_test_rfe.shape)
 
     # save results
-    for dataset_type, df in zip(["train_set", "test_set"], [df_train, df_test]):
+    for dataset_type, df in zip(["train_set", "test_set"], [df_train_rfe, df_test_rfe]):
         output_path = config[storage_type]["feature_selection"][dataset_type]["path"]
         log.info(f"Saving {dataset_type} with dimension {df.shape} to {output_path}")
         df.to_csv(output_path, index=False)
