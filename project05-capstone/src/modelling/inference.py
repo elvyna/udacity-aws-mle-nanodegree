@@ -6,6 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
 import pickle
+from io import StringIO 
 
 logging.basicConfig(
     format="%(filename)s %(asctime)s %(levelname)s Line no: %(lineno)d %(message)s",
@@ -152,7 +153,7 @@ def model_fn(model_dir):
     return model_clf
 
 
-def input_fn(request_body, content_type=JSON_CONTENT_TYPE):
+def input_fn(request_body, content_type):
     assert (
         content_type in [JSON_CONTENT_TYPE, CSV_CONTENT_TYPE]
     ), f"Request has an unsupported ContentType in content_type: {content_type}"
@@ -163,15 +164,22 @@ def input_fn(request_body, content_type=JSON_CONTENT_TYPE):
     log.info("Deserializing the input data.")
     log.info(f"Request body is: {request_body}")
     
-    if content_type == JSON_CONTENT_TYPE:
-        ## convert input json object as a dataframe of one row
-        request = json.loads(request_body)
-        log.debug(f"Loaded JSON object: {request}")
-        df_test = pd.json_normalize(request)
-    else:
+    try:
+        if content_type == JSON_CONTENT_TYPE:
+            ## convert input json object as a dataframe of one row
+            request = json.loads(request_body)
+            log.debug(f"Loaded JSON object: {request}")
+            df_test = pd.json_normalize(request)
+        else:
+            data = request_body.decode('utf-8')
+            s = StringIO.StringIO(data)
+            df_test = pd.read_csv(s, header=None)
+            
+        df_test = preprocess_input(df_test=df_test)
+    except:
         df_test = pd.read_csv(request_body)
-
-    df_test = preprocess_input(request_body=df_test)
+        df_test = preprocess_input(df_test=request_body)
+        
     return df_test
 
 
