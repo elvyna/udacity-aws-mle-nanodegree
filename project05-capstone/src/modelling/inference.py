@@ -157,11 +157,11 @@ def input_fn(request_body, content_type=JSON_CONTENT_TYPE):
         content_type in [JSON_CONTENT_TYPE, CSV_CONTENT_TYPE]
     ), f"Request has an unsupported ContentType in content_type: {content_type}"
 
-    log.debug(f"Request body CONTENT-TYPE is: {content_type}")
-    log.debug(f"Request body TYPE is: {type(request_body)}")
+    log.info(f"Request body CONTENT-TYPE is: {content_type}")
+    log.info(f"Request body TYPE is: {type(request_body)}")
     
     log.info("Deserializing the input data.")
-    log.debug(f"Request body is: {request_body}")
+    log.info(f"Request body is: {request_body}")
     
     if content_type == JSON_CONTENT_TYPE:
         ## convert input json object as a dataframe of one row
