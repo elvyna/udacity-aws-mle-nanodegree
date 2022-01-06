@@ -13,13 +13,15 @@ The repository is structured as follows.
 |
 ├── config             <- config files used on the python scripts
 |
+├── dataset            <- dataset used in the project
+|
 ├── img                <- screenshots for the README
 |
 ├── notebook           <- supporting notebooks for exploration etc.
 |
 ├── proposal           <- files related to the project proposal
 |
-├── report           <- files related to the project report
+├── report             <- files related to the project report
 |
 └── src                <- scripts
 ```
@@ -43,7 +45,14 @@ pip-sync
 
 ### AWS
 
-The notebooks stored on `notebook/sagemaker` are specifically prepared to be executed on AWS Sagemaker. Ensure the datasets are stored in S3, since they are referred by the model training scripts.
+The notebooks stored on `notebook/sagemaker` are specifically prepared to be executed on AWS Sagemaker.
+
+- Hyperparameter tuning: `notebook/sagemaker/00-sm-hp-tuning.ipynb`
+- Final model training and deployment: `notebook/sagemaker/01-sm-train-deploy.ipynb`
+
+These notebooks refer to Python scripts stored in `src/modelling`. Find relevant screenshots of the results in `img/report/` or by reading the final report file.
+
+Note: ensure the datasets are stored in S3, since they are referred by the model training scripts.
 
 ![s3-bucket-preview](img/report/aws-s3-bucket-preview.png)
 
