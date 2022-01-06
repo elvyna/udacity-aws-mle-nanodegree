@@ -18,8 +18,13 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler(sys.stdout))
 
 JSON_CONTENT_TYPE = "application/json"
-NUMPY_CONTENT_TYPE = "application/x-npy"
 CSV_CONTENT_TYPE = "text/csv"
+DEFAULT_COLUMN_NAME_LIST = [
+    "sessionNo", "startHour", "startWeekday", "duration", "cCount", "cMinPrice", "cMaxPrice","cSumPrice",
+    "bCount", "bMinPrice", "bMaxPrice", "bSumPrice", "bStep", "onlineStatus", "availability", 
+    "customerNo", "maxVal","customerScore","accountLifetime","payments","age",
+    "address","lastOrder"
+]
 
 
 def determine_time_of_day(df: pd.DataFrame, column_name: str) -> pd.DataFrame:
@@ -52,7 +57,7 @@ def preprocess_input(df_test):
     ## reformat data types
     for col in df_test.columns:
         ## replace missing value with a numeric value, e.g., -99
-        mask = df_test[col] == "?"
+        mask = (df_test[col] == "?")
         df_test.loc[mask, col] = -99
 
     ## reformat data types
@@ -158,7 +163,6 @@ def input_fn(request_body, content_type):
     assert content_type in [
         JSON_CONTENT_TYPE,
         CSV_CONTENT_TYPE,
-        NUMPY_CONTENT_TYPE,
     ], f"Request has an unsupported ContentType in content_type: {content_type}"
 
     log.info(f"Request body CONTENT-TYPE is: {content_type}")
@@ -167,29 +171,19 @@ def input_fn(request_body, content_type):
     log.info("Deserializing the input data.")
     log.info(f"Request body is: {request_body}")
 
-    try:
-        if content_type == JSON_CONTENT_TYPE:
-            ## convert input json object as a dataframe of one row
-            request = json.loads(request_body)
-            log.info(f"Loaded JSON object: {request}")
-            df_test = pd.json_normalize(request["data"])
-        elif content_type == NUMPY_CONTENT_TYPE:
-            request_body = request_body.decode("utf-8")
-            request = np.load(request_body)
-            log.info(f"Loaded JSON object: {request}")
-            df_test = pd.DataFrame(request)
-        elif content_type == CSV_CONTENT_TYPE:
-            # data = request_body.decode('utf-8')
-            # s = StringIO.StringIO(data)
-            s = StringIO(request_body)
-            df_test = pd.read_csv(s, header=None)
+    if content_type == JSON_CONTENT_TYPE:
+        ## convert input json object as a dataframe of one row
+        request = json.loads(request_body)
+        log.info(f"Loaded JSON object: {request}")
+        df_test = pd.DataFrame(request["data"], index=[0])
+    elif content_type == CSV_CONTENT_TYPE:
+        # data = request_body.decode('utf-8')
+        # s = StringIO.StringIO(data)
+        s = StringIO(request_body)
+        df_test = pd.read_csv(s, header=None)
+        df_test.columns = DEFAULT_COLUMN_NAME_LIST
 
-        df_test = preprocess_input(df_test=df_test)
-    except Exception as e:
-        log.info(e)
-        df_test = pd.read_csv(request_body)
-        df_test = preprocess_input(df_test=request_body)
-
+    df_test = preprocess_input(df_test=df_test)
     return df_test
 
 
@@ -200,5 +194,7 @@ def predict_fn(input_object, model):
     log.info("Calling model")
     feature_name_list = model.feature_names
     prediction = model.predict(input_object[feature_name_list])
+    
+    log.info(f"Prediction results:\n{prediction}")
 
     return prediction
