@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
 import pickle
-from io import StringIO 
+from io import StringIO
 
 logging.basicConfig(
     format="%(filename)s %(asctime)s %(levelname)s Line no: %(lineno)d %(message)s",
@@ -155,16 +155,18 @@ def model_fn(model_dir):
 
 
 def input_fn(request_body, content_type):
-    assert (
-        content_type in [JSON_CONTENT_TYPE, CSV_CONTENT_TYPE, NUMPY_CONTENT_TYPE]
-    ), f"Request has an unsupported ContentType in content_type: {content_type}"
+    assert content_type in [
+        JSON_CONTENT_TYPE,
+        CSV_CONTENT_TYPE,
+        NUMPY_CONTENT_TYPE,
+    ], f"Request has an unsupported ContentType in content_type: {content_type}"
 
     log.info(f"Request body CONTENT-TYPE is: {content_type}")
     log.info(f"Request body TYPE is: {type(request_body)}")
-    
+
     log.info("Deserializing the input data.")
     log.info(f"Request body is: {request_body}")
-    
+
     try:
         if content_type == JSON_CONTENT_TYPE:
             ## convert input json object as a dataframe of one row
@@ -172,7 +174,7 @@ def input_fn(request_body, content_type):
             log.info(f"Loaded JSON object: {request}")
             df_test = pd.json_normalize(request["data"])
         elif content_type == NUMPY_CONTENT_TYPE:
-            request_body = request_body.decode('utf-8')
+            request_body = request_body.decode("utf-8")
             request = np.load(request_body)
             log.info(f"Loaded JSON object: {request}")
             df_test = pd.DataFrame(request)
@@ -181,13 +183,13 @@ def input_fn(request_body, content_type):
             # s = StringIO.StringIO(data)
             s = StringIO(request_body)
             df_test = pd.read_csv(s, header=None)
-            
+
         df_test = preprocess_input(df_test=df_test)
     except Exception as e:
         log.info(e)
         df_test = pd.read_csv(request_body)
         df_test = preprocess_input(df_test=request_body)
-        
+
     return df_test
 
 
@@ -196,6 +198,7 @@ def predict_fn(input_object, model):
     log.info("In predict_fn")
 
     log.info("Calling model")
-    prediction = model.predict(input_object)
+    feature_name_list = model.feature_names
+    prediction = model.predict(input_object[feature_name_list])
 
     return prediction
