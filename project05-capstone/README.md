@@ -19,6 +19,8 @@ The repository is structured as follows.
 |
 ├── proposal           <- files related to the project proposal
 |
+├── report           <- files related to the project report
+|
 └── src                <- scripts
 ```
 
@@ -41,19 +43,24 @@ pip-sync
 
 ### AWS
 
-**TO DO**
-- S3 bucket preview - data store
-- `notebook/sagemaker` for hp tuning, training, and deploy
-- TO DO: prepare step functions to trigger endpoint?
+The notebooks stored on `notebook/sagemaker` are specifically prepared to be executed on AWS Sagemaker. Ensure the datasets are stored in S3, since they are referred by the model training scripts.
 
-## Future Improvement
+![s3-bucket-preview](img/report/aws-s3-bucket-preview.png)
+
+## Future Improvements
 
 ### Modelling
 
-- ...
-- ...
+- Further exploratory analysis to identify more important features to be engineered
+- Try using embedding methods, such as autoencoders
+- Explore different algorithms, such as using neural networks and Shapley values to allow model interpretability
+- Further hyperparameter tuning
+
 
 ### ML Ops
 
-- Orchestrate the end-to-end scripts as step functions (require containerization) or as sagemaker pipeline (run them as sagemaker processing job)
+- Code refactoring for better code readability and maintenance
+- Move hard-coded variables names into configuration files
+- Write unit tests and data validation scripts to ensure data quality
+- Orchestrate the end-to-end scripts as step functions (require containerization) or as a Sagemaker Pipeline (run the data preprocessing and feature engineering steps as Sagemaker Processing jobs)
 - Model monitoring and retraining
